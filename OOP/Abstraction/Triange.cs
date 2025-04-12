@@ -17,5 +17,10 @@ namespace OOP.Abstraction
             Height = height;
         }
         public override double GetArea() => 0.5 * Height * Side;  // 1/2 - целочисленное деление, результат будет 0
+
+        public override void Draw()
+        {
+            Console.WriteLine("Нарисовали треугольник");
+        }
     }
 }

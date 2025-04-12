@@ -19,5 +19,10 @@ namespace OOP.Abstraction
 
         public override double GetArea() => Width * Height;
 
+        public override void Draw()
+        {
+            Console.WriteLine("Нарисовали прямоугольник");
+        }
+
     }
 }

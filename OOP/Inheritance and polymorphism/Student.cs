@@ -15,7 +15,8 @@ namespace OOP
             Grade = grade;
         }
 
-        public override void Introduce()
+        public override void Introduce() //Если использовать new, а не override, то при приведении к классу родителя будет вызываться родительский метод.
+                                         //Нью - скрытие. Это уже не полиморфизм. Нью и без virtual можно использовать
         {
             Console.WriteLine($"Меня зовут {Name}, я учусь в {Grade} классе");
         }

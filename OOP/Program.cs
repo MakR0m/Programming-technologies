@@ -1,4 +1,5 @@
-﻿using OOP.Encapsulation;
+﻿using OOP.Abstraction;
+using OOP.Encapsulation;
 
 namespace OOP
 {
@@ -37,6 +38,14 @@ namespace OOP
             Teacher teacher = new Teacher("Himiya","Victor",45);
             List<Person> people = new List<Person>() { student, teacher };
             PrintIntroduction(people);
+
+            List<Shape> shapes = new List<Shape> { new Triange(10,5), new Rectangle(10,5), new Circle(10) };
+            foreach (Shape shape in shapes)
+            {
+                shape.GetArea();
+                shape.Draw();
+            }
+
         }
 
         public static void PrintIntroduction(List<Person> people)

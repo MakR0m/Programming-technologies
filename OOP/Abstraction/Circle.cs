@@ -17,5 +17,10 @@ namespace OOP.Abstraction
 
         public override double GetArea() => Math.PI * Radius * Radius;
 
+        public override void Draw()
+        {
+            Console.WriteLine("Нарисовали круг");
+        }
+
     }
 }

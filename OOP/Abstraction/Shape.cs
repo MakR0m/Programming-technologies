@@ -18,6 +18,16 @@ namespace OOP.Abstraction
         //Когда выбрать abstract class?
         //Когда предполагаешь общее поведение или общие данные(например, координаты, цвет, прозрачность, имя и т.п.).
         //Когда хочешь расширить архитектуру в будущем(например, добавить общие методы, логирование, сериализацию, общий рендеринг).
+        public (double X, double Y) Position { get; protected set; }
+        
+        public virtual void MoveTo(double x, double y)
+        {
+            Console.WriteLine($"Соединяем {Position.X} {Position.Y} с {x}, {y}");
+        }
+        public virtual void Draw()
+        {
+            Console.WriteLine($"Фигура расположена в точке {Position.X} {Position.Y}");
+        }
 
         public abstract double GetArea();
     }
