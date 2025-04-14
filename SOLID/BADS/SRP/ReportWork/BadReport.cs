@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.BAD_SRP
+namespace SOLID.BADS.SRP
 {
-    internal class Report
+    internal class BadReport
     {
         public string Tittle {  get; set; }
         public string Content {  get; set; }

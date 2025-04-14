@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.GOOD_SRP.UserServices
+namespace SOLID.SRP.UserServices
 {
-    internal interface IPasswordHasher
+    internal interface IUserRepository
     {
-        string Hash(string password);
+        void Save(User user);
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.GOOD_SRP.UserServices
+namespace SOLID.SRP.UserServices
 {
     internal class UserService
     {

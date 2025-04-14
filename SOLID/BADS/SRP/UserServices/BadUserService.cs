@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.BAD_SRP.UserServices
+namespace SOLID.BADS.SRP
 {
-    internal class UserService
+    internal class BadUserService
     {
         // Данный сервис должен заниматься только процессом регистрации. Хеширование, сохранени и отправка писем должны быть делегированы в другие классы
 

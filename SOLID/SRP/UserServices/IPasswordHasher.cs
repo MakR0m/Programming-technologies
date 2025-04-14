@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.GOOD_SRP.UserServices
+namespace SOLID.SRP.UserServices
 {
-    internal interface IEmailSender
+    internal interface IPasswordHasher
     {
-        void Send(string username, string v);
+        string Hash(string password);
     }
 }

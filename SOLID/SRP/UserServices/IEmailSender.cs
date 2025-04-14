@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.GOOD_SRP.UserServices
+namespace SOLID.SRP.UserServices
 {
-    internal interface IUserRepository
+    internal interface IEmailSender
     {
-        void Save(User user);
+        void Send(string username, string v);
     }
 }

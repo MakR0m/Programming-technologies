@@ -1,4 +1,4 @@
-﻿namespace SOLID.GOOD_SRP.UserServices
+﻿namespace SOLID.SRP.UserServices
 {
     internal class User
     {

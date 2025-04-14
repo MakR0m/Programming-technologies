@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOLID.GOOD_SRP
+namespace SOLID.SRP.ReportWork
 {
     internal class EmailSender
     {
