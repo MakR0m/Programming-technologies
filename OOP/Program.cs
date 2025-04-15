@@ -1,4 +1,5 @@
 ﻿using OOP.Abstraction;
+using OOP.DelegateAndEvent;
 using OOP.Encapsulation;
 
 namespace OOP
@@ -22,6 +23,7 @@ namespace OOP
         // абстрактный класс - Базовый класс от которого нельзя создать экземпляр напрямую. Может содержать как реализованные методы, так и абстрактные
         // virtual/override - Механизм полиморфизма
         // private, public, protected, internal - модификаторы доступа
+
     #endregion
 
 
@@ -46,6 +48,12 @@ namespace OOP
                 shape.Draw();
             }
 
+
+
+            WorkWithDelegate();
+
+            WorkWithEvent();
+
         }
 
         public static void PrintIntroduction(List<Person> people)
@@ -55,5 +63,70 @@ namespace OOP
                 person.Introduce();
             }
         }
+        #region Delegate
+
+        // Делегат - ссылка на метод с опред сигнатурой. Можно выносить в отдельный файл. Это тип данных
+
+        public static void WorkWithDelegate()
+        {
+            MyDelegate del = PrintMessage;
+            del += PrintMessage1;
+            del("privet");
+
+            Operator op = new Operator(Plus);
+            op += Minus;
+            op += Multiply;
+            int i = op(5, 5);
+
+            Operator op2 = (int a, int b) => a / b;  // Анонимный метод
+            int n = op2(10, 2);
+
+        }
+
+        public delegate void MyDelegate(string message);
+
+        public static void PrintMessage(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        public static void PrintMessage1(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        public delegate int Operator(int a, int b);
+
+        public static int Plus(int a, int b) => a + b;
+        public static int Minus(int a, int b) => a - b;
+        public static int Multiply(int a, int b) => a * b;
+
+        #endregion
+
+        #region Event
+
+        // Событие - синт сахар вокруг делегатов, который обеспечивает: инкапсуляцию (подписчики не могу вызвать событие напрямую) и возможность подписки, отписки.
+
+        public static void WorkWithEvent()
+        {
+            Counter counter = new Counter(15);
+            counter.ThresholdReached += OnThresholdReached;
+            counter.Add(10);
+            counter.Add(15);
+        }
+
+        static void OnThresholdReached(object sender, ThresholdReachedEventArgs e)
+        {
+            Console.WriteLine($"Порог {e.Threshold} достигнут в {e.TimeReached}");
+        }
+
+        #endregion
+
+        #region Action and Func
+
+
+
+        #endregion
+
     }
 }
