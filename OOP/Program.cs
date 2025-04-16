@@ -1,6 +1,9 @@
 ﻿using OOP.Abstraction;
 using OOP.DelegateAndEvent;
+using OOP.DelegateAndEvent.FuncAndAction;
+using OOP.DelegateAndEvent.Generics;
 using OOP.Encapsulation;
+using System;
 
 namespace OOP
 {
@@ -53,6 +56,8 @@ namespace OOP
             WorkWithDelegate();
 
             WorkWithEvent();
+
+            WorkWithGenerics();
 
         }
 
@@ -123,8 +128,72 @@ namespace OOP
         #endregion
 
         #region Action and Func
+        //Action и Func - универсальный встроенные делегаты - определенные типы, которые можно использоваться вместо собственных делегатов, если нгужна простая сигнатура
+        //Action — метод, который ничего не возвращает
+        //Func - метод, который возвращает значение
+        //Predicate<T> - частный случай Func<T,bool>
+        
+        public static void WorkWithActionAndFunc()
+        {
+            Action<string> print = message => Console.WriteLine(message);  // аналогично делегату delegate void PrintDelegate(string message);
+            print("Privet");
+
+            Func<int, int, int> sum = (a, b) => a + b;    //У Func последний аргумент - это тип возвращаемого значения, остальные - входные
+
+            Func<string> getMessage = () => "Privet";
+
+            Func<string,int,bool> checkLenght = (text, len) => text.Length == len;
+
+            Predicate<int> isEven = x => x %2 == 0;       //Частый случай Func всегда возвращает bool.
+        }
+
+        //Делегат      | Что делает                       | Сигнатура
+        //Action<T>    | Метод без возвращаемого значения | void MyMethod(T)
+        //Func<T, R>   | Метод с возвращаемым значением   | R MyMethod(T)
+        //Predicate<T> | Проверка условия                 | bool MyMethod(T)
+
+        //Ситуация                                    | Рекомендация
+        //Простая сигнатура(1–3 параметра)            | Action, Func, Predicate
+        //Явное семантическое имя важно(ClickHandler) | Собственный delegate
+        //Будет использоваться в event                | Обычно создают именованный делегат
+        //Метод возвращает void                       | Action<>
+        //Метод возвращает результат                  | Func<>
 
 
+
+        #endregion
+
+        #region Generics
+        //Обобщения позволяют написать класс/метод один раз, но использовать с разными типами
+        //"Я пока не знаю, с каким типом буду работать, но ты мне его скажешь позже."
+        //Можно ограничить типы.
+        //where T : class. T должен быть ссылочным типом (string, object, List<T>, любой class)
+        //where T : struct.  T должен быть значимым типом (int, double, DateTime, и т.д.)
+        //where T : new(). T должен иметь публичный конструктор без параметров.
+        //where T : SomeBaseClass. T должен быть наследником или самим классом
+        //where T : interface. Т должен РЕАЛИЗОВЫВАТЬ интерфейс
+        //Можно задавать множественные ограничения
+
+        public static void WorkWithGenerics()
+        {
+            var intBox = new Box<int>(42);
+            var stringBox = new Box<string>("Hi");
+            intBox.Print();
+            stringBox.Print();
+
+            var processor = new Processor<int>( new List<int> {1,2,3,4,5});
+            processor.ApplyAction(x => Console.Write(x*2));
+            processor.Transform(x => x * 2);
+            Console.WriteLine();
+            processor.ApplyAction(Console.Write);
+        }
+
+        //Обобщенные методы можно делать не в обобщенном классе.
+        //Сценарий                             | Обобщённый класс | Обобщённый метод
+        //Один и тот же T нужен во всём классе | +                | 
+        //Нужно однотипное хранилище(List<T>)  | +                | 
+        //В классе обобщения не нужны          |                  | +
+        //Метод работает с любыми типами       |                  | +
 
         #endregion
 
