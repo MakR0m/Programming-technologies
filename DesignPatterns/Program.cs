@@ -1,5 +1,7 @@
 ﻿using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
+using DesignPatterns.Creational.Singleton;
+using DesignPatterns.Creational.Singleton.AppSettings_example_;
 
 namespace DesignPatterns
 {
@@ -14,15 +16,54 @@ namespace DesignPatterns
 
         static void Main(string[] args)
         {
+            WorkWithSingleton();
+
+            Console.WriteLine(new string('_', 50));
+
             StrategyWork();
         }
+
+        #region Порождающие
+
+        #region Singleton
+        //Обеспечивает, что у класса есть только один экземпляр, и предоставляет глобальную точку доступа к нему.
+        //Пример, когда нужен только один обьект: логгер, конфигурация, кэш, подключение к б.д. и т.д.)
+        //Когда глобальное состояние оправдано
+
+        static void WorkWithSingleton()
+        {
+            Singleton.Instance.SayHello();
+            ThreadSafeSingleton.Instance.SayHello();
+
+            var config = AppSettings.Instance;
+
+            Console.WriteLine(config.DatabaseConnectionString);
+            Console.WriteLine("Логирование включено? " + config.EnableLogging);
+
+            //Изменение конфигурации
+            config.SetConncetionString("another connection string");
+            config.EnableOrDisableLogging(false);
+
+            // повторный вызов тотже обьект
+            var again = AppSettings.Instance;
+            Console.WriteLine(again.DatabaseConnectionString);
+        }
+        
+
+
+        #endregion
+
+        #endregion
+
+
+        #region Поведенческие
 
         #region Strategy
         //Стратегия - это когда у тебя есть несколько разных вариантов сделать одно и то же, а какой из вариантов будет выбран известно только во время выполнения
         //Иерархия классов-реализаций интерфейса - это сложно, надо имена придумать, чтобы они логичным были и т.д.
         //А часто стратегия нужна только в одном месте просто выбрать что-то. Поэтому поумолчанию лучше делать простой вариант через делегаты.
         //Если этого мало, или такой выбор в нескольких местах происходит, то тогда уже переходить к иерархии
-        
+
         //Strategy - подстановка поведения по интерфейсу
         //Позволяет динамически подменять алгоритм или поведение объекта во время выполнение, не изменяя его сам.
         //1. Есть общий интрфейс (стратегия). 2. Есть несколько реализаций (вариантов поведения). 3. Есть контекст, которому подставляем нужную стратегию
@@ -88,5 +129,6 @@ namespace DesignPatterns
 
         #endregion
 
+        #endregion
     }
 }
