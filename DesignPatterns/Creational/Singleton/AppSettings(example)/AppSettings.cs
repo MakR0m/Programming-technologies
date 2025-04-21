@@ -9,7 +9,7 @@ namespace DesignPatterns.Creational.Singleton.AppSettings_example_
     public class AppSettings
     {
         private static AppSettings _instance;
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new object(); 
 
         public static AppSettings Instance
         {

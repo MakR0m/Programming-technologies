@@ -47,6 +47,10 @@ namespace DesignPatterns
             // повторный вызов тотже обьект
             var again = AppSettings.Instance;
             Console.WriteLine(again.DatabaseConnectionString);
+
+            var config1 = LazyAppSettings.Instance;
+            Console.WriteLine(config1.DatabaseConnectionString);
+            Console.WriteLine("Логирование включено? " + config1.EnableLogging);
         }
         
 
