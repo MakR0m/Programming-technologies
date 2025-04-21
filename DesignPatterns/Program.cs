@@ -1,5 +1,6 @@
 ﻿using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
+using DesignPatterns.Creational.FactoryMethod.MessageFabric;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
 
@@ -17,6 +18,10 @@ namespace DesignPatterns
         static void Main(string[] args)
         {
             WorkWithSingleton();
+
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithFactoryMethod();
 
             Console.WriteLine(new string('_', 50));
 
@@ -52,9 +57,28 @@ namespace DesignPatterns
             Console.WriteLine(config1.DatabaseConnectionString);
             Console.WriteLine("Логирование включено? " + config1.EnableLogging);
         }
-        
 
 
+
+        #endregion
+
+        #region Factory Method
+
+        //Фабричный метод делегирует создание обьектов подклассам. Вместо нью используется метод-фабрика, который можно переопределить.
+        //Изолирует создание обьектов, упрощает добавление новых типов, следуется принципу ОСР
+
+        //Случай                                Strategy                         Factory
+        //Я сам решаю, как объект себя ведёт	✅ отлично	                    ❌ неудобно(нужно лезть внутрь объекта)
+        //Я хочу получать разные типы объектов	❌ Strategy не помогает	        ✅ Factory удобна для расширения
+        //Я делаю расширяемый фреймворк	        🤝 часто используется внутри	✅ фабрики — основной способ подмены
+
+
+        public static void WorkWithFactoryMethod()
+        {
+            MessageCreator creator = new EmailMessageCreator();
+            var message = creator.CreateMessage();
+            message.Send("Hello");
+        }
         #endregion
 
         #endregion
