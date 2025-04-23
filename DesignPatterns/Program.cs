@@ -1,5 +1,7 @@
 ﻿using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
+using DesignPatterns.Creational.Builder.HttpRequest;
+using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
@@ -22,6 +24,10 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithFactoryMethod();
+
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithBuilder();
 
             Console.WriteLine(new string('_', 50));
 
@@ -81,6 +87,45 @@ namespace DesignPatterns
         }
         #endregion
 
+        #region Builder
+        //Builder позволяет пошагово создавать сложный обьект, отделяя процесс построения от самой структуры обьекта
+        //Используется:
+        //когда обьект имеет много параметров (в том числе необязательных),
+        //когда нужно гибко настраиват обьект без длинного конструктора (более 10 аргументов).
+        //когда нужно повторно использовать одну и ту же схему построения, но с разными конфигурациями.
+
+        public static void WorkWithBuilder()
+        {
+            var user = new UserBuilder() //Плавный интерфейс. Цепочка вызовов, которая работает из-за return this.
+                .SetName("Igor")
+                .SetEmail("@mail")
+                .SetAddress("Pushkina")
+                .SetAge(10)
+                .Build();
+            Console.WriteLine(user.ToString());
+
+            var request = new HttpRequestBuilder()
+                .SetMethod("POST")
+                .SetUrl("https://api.example.com/data")
+                .AddHeader("Authorization", "Bearer TOKEN")
+                .AddHeader("Content-Type", "application/json")
+                .SetBody("{\"name\":\"test\"}")
+                .Build();
+            Console.WriteLine(request.ToString());
+
+            var query = new SqlQueryBuilder()
+                .Select("name", "email")
+                .From("users")
+                .Where("age > 18")
+                .Where("is_active = 1")
+                .OrderBy("name")
+                .Build();
+
+            Console.WriteLine(query);
+        }
+
+
+        #endregion
         #endregion
 
 
