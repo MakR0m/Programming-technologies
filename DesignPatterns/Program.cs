@@ -4,6 +4,7 @@ using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
 using DesignPatterns.Creational.Prototype;
+using DesignPatterns.Creational.Prototype.TemplateForm;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
 
@@ -151,6 +152,35 @@ namespace DesignPatterns
 
             Console.WriteLine(original);
             Console.WriteLine(copy);
+
+
+            var template = new TemplateForm
+            {
+                Title = "Заявление на отпуск",
+                Fields = new List<FormField>
+                {
+                    new FormField { Label = "ФИО" },
+                    new FormField { Label = "Даты отпуска" },
+                    new FormField { Label = "Причина" }
+                }
+            };
+
+            var form1 = template.Clone();                           //Создание новых обьектов на основе копии и изменения, чтобы не писать new.
+            form1.Fields[0].Value = "Иван Петров";
+            form1.Fields[1].Value = "01.06.2025 - 15.06.2025";      //Интерфейс нужен для того, чтобы быть увереным, что классы будут клонироваться, например для работы с дженериками.
+            form1.Fields[2].Value = "По личным причинам";           //если нужен обобщенный метод, который точно должен работать с методом клон в любом типе, в котором он есть Where T : IPrototype<T>
+
+            var form2 = template.Clone();
+            form2.Fields[0].Value = "Анна Смирнова";
+            form2.Fields[1].Value = "10.07.2025 - 24.07.2025";
+            form2.Fields[2].Value = "Учебный отпуск";
+
+            // Вывод
+            template.Print(); // шаблон пустой — не испорчен
+            form1.Print();    // заполненная форма Ивана
+            form2.Print();    // заполненная форма Анны
+
+
         }
 
         #endregion
