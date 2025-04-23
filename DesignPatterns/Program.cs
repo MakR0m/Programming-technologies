@@ -7,6 +7,7 @@ using DesignPatterns.Creational.Prototype;
 using DesignPatterns.Creational.Prototype.TemplateForm;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
+using DesignPatterns.Structural.Adapter.Logger;
 
 namespace DesignPatterns
 {
@@ -34,6 +35,9 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithPrototype();
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithAdapter();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -187,6 +191,24 @@ namespace DesignPatterns
 
         #endregion
 
+        #region Структурые
+
+        #region Adapter
+
+        // Адаптер позволяет обьектам с несовместимыми интерфейсами работать вместе, оборачивая один интерфейс в другой - без изменения исходного кода
+        // "У меня есть объект, который делает нужное, но не так, как мне нужно. Я просто адаптирую его интерфейс."
+        // Пример с переходником
+        //Когда использовать: нельзя изменить сторонний код, клиент ждет нужный интефрейс, хочешь внедрить в систему чужой обьект
+
+        public static void WorkWithAdapter()
+        {
+            ILogger logger = new LoggerAdapter(new ExternalLogger());     //Реализуем интерфейс в классе адаптер, а класс адаптер использует внешний класс.
+            logger.Log("Приложение запущено");
+        }
+
+        #endregion
+
+        #endregion
 
         #region Поведенческие
 
