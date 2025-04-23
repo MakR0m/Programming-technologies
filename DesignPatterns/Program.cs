@@ -3,6 +3,7 @@ using DesignPatterns.Behavioral.Strategy.ProductFilter;
 using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
+using DesignPatterns.Creational.Prototype;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
 
@@ -29,6 +30,9 @@ namespace DesignPatterns
 
             WorkWithBuilder();
 
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithPrototype();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -126,6 +130,31 @@ namespace DesignPatterns
 
 
         #endregion
+
+        #region Prototype
+
+        //Prototype позволяет создавать копии обьектов без привязки к их конкретному классу, используя метод .Clone()
+        //Используется когда создание нового обьекта слишком дорого (глубокая инициализация),
+        //Когда нужно клонировать обьект с небольшими изменениями.
+        //Когда нужно копировать структуру, но не использовать new напрямую
+        public static void WorkWithPrototype()
+        {
+            var original = new Report
+            {
+                Title = "Отчёт за май",
+                Author = "Ирина",
+                Pages = new() { "стр.1", "стр.2" }
+            };
+
+            var copy = original.Clone();
+            copy.Title = "Копия отчёта";
+
+            Console.WriteLine(original);
+            Console.WriteLine(copy);
+        }
+
+        #endregion
+
         #endregion
 
 
