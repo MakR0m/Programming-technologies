@@ -8,6 +8,7 @@ using DesignPatterns.Creational.Prototype.TemplateForm;
 using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
 using DesignPatterns.Structural.Adapter.Logger;
+using DesignPatterns.Structural.Bridge.Shape;
 
 namespace DesignPatterns
 {
@@ -38,6 +39,9 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithAdapter();
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithBridge();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -206,6 +210,25 @@ namespace DesignPatterns
             logger.Log("Приложение запущено");
         }
 
+        #endregion
+
+        #region Bridge
+        //Мост разделяет абстракцию и реализацию, чтобы они могли развиваться независимо друг от друга
+        //"Есть интерфейс и есть разные реализации - но нет необходимости жестко их связывать"
+        //Паттерн позволяет гибко и независимо их комбинировать
+
+        public static void WorkWithBridge()
+        {
+            IRenderer vector = new VectorRenderer();    //Можно добавлять новые фигуры, можно добавлять новые способы отрисовки. Гибко и без дублирования
+            Shape circle = new Circle(vector, 5);
+            circle.Draw();
+                                                        //Просто использовать интерфейс - это инверсия зависимостей,
+                                                        //а мост - это структура в которой абстракция содержит ссылку на реализацию и они развиваются независимо.
+                                                        //В данном случае мост это поле типа интерфейса в абстрактном классе shape
+            IRenderer raster = new RasterRenderer();
+            Shape circle2 = new Circle(raster, 10);
+            circle2.Draw();
+        }
         #endregion
 
         #endregion
