@@ -13,6 +13,7 @@ using DesignPatterns.Structural.Composite.FileSystem;
 using DesignPatterns.Structural.Composite.GraphicGroups;
 using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
+using DesignPatterns.Structural.Facade.HomeTheaterFacade;
 
 namespace DesignPatterns
 {
@@ -52,6 +53,9 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithDecorator();
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithFacade();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -308,6 +312,21 @@ namespace DesignPatterns
 
         }
 
+        #endregion
+
+        #region Facade
+        //Обеспечивает упрощенный интерфейс к сложно системе. Скрывает внутреннюю структуру, предоставляя единую точку входа для клиента
+        //Есть множество сложных классов, настроек, зависимостей, но необходимо, чтобы пользователь работал только с одним удобным объектом
+        // Нажимаешь одну кнопку на пульте, а за этим следует включение телевизора, настройка проектора, выключение света и запуск фильма.
+        //Один RemoteControl обеспечивает доступ к множеству подсистем.
+
+        // Используется когда: много компонентов, нет необходимости знать реализацию, необходимо облегчить использование системы, ограничить доступ к внутренним частям
+        //Частный случай вью модели может выступать в роли фасада.
+        public static void WorkWithFacade()
+        {
+            var theater = new HomeTheaterFacade(new Projector(), new SoundSystem(), new Screen());
+            theater.WatchMovie("Interstellar");
+        }
         #endregion
 
         #endregion
