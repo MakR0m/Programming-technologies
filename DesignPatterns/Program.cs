@@ -9,6 +9,8 @@ using DesignPatterns.Creational.Singleton;
 using DesignPatterns.Creational.Singleton.AppSettings_example_;
 using DesignPatterns.Structural.Adapter.Logger;
 using DesignPatterns.Structural.Bridge.Shape;
+using DesignPatterns.Structural.Composite.FileSystem;
+using DesignPatterns.Structural.Composite.GraphicGroups;
 
 namespace DesignPatterns
 {
@@ -17,9 +19,9 @@ namespace DesignPatterns
         //Паттерны проектирования - это готовые решения типичных задач в архитектуре кода.
         //Паттерны - это подход/принцип как решать задачи гибко, понятно и масштабируемо
         //Классификация паттернов по Банде четырех:
-        //Порождающие (Creational)   - как создавать оьбекты                     - Singleton, Factory, Builder
-        //Структурные (Stuctural)    - как организовать отношения между классами - Adapter, Decorator, Composite
-        //Поведенческие (Bahavior)   - как управлять взаимодействием обьектов    - Strategy, Observer, Command
+        //Порождающие (Creational)   - как создавать объекты                     - Singleton, Factory, Builder
+        //Структурные (Structural)    - как организовать отношения между классами - Adapter, Decorator, Composite
+        //Поведенческие (Behavior)   - как управлять взаимодействием объектов    - Strategy, Observer, Command
 
         static void Main(string[] args)
         {
@@ -42,6 +44,9 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithBridge();
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithComposite();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -220,15 +225,55 @@ namespace DesignPatterns
         public static void WorkWithBridge()
         {
             IRenderer vector = new VectorRenderer();    //Можно добавлять новые фигуры, можно добавлять новые способы отрисовки. Гибко и без дублирования
-            Shape circle = new Circle(vector, 5);
+            Shape circle = new Structural.Bridge.Shape.Circle(vector, 5);
             circle.Draw();
                                                         //Просто использовать интерфейс - это инверсия зависимостей,
                                                         //а мост - это структура в которой абстракция содержит ссылку на реализацию и они развиваются независимо.
                                                         //В данном случае мост это поле типа интерфейса в абстрактном классе shape
             IRenderer raster = new RasterRenderer();
-            Shape circle2 = new Circle(raster, 10);
+            Shape circle2 = new Structural.Bridge.Shape.Circle(raster, 10);
             circle2.Draw();
         }
+        #endregion
+
+        #region Composite (Компоновщик)
+            //Позволяет обращаться к отдельным объектам и их композициям (деревьям) одинаково - через общий интерфейс.
+            //Есть один элемент (например, кнопка). Есть контейнер, в котором могут быть другие кнопки, поля или даже другие контейнеры.
+            //Компоновщик позволяет работать с ними как с одним и тем же типом.
+            //Кнопка, лейбл, ТекстБокс в Панели. Файл и Папка. Иерархия сотрудников. (Дерево)
+            //Элемент и группа реализуют один и тот же интерфейс, а клиентский код не отличает "лист" от "состава"
+            //Используется когда иерархия объектов, когда нужно вложить объекты друг в друга, когда нужен единый интерфейс для элементов и контейнеров
+        public static void WorkWithComposite()
+        {
+            var circle = new Structural.Composite.GraphicGroups.Circle();
+            var square = new Square();
+
+            var group = new GraphicGroup();
+            group.Add(circle);
+            group.Add(square);
+            
+            var superGroup = new GraphicGroup();
+            superGroup.Add(group);
+            superGroup.Add(new Square());
+            
+            superGroup.Draw();
+
+            var root = new Folder("Root");
+            var docs = new Folder("Documents");
+            var pics = new Folder("Pictures");
+
+            docs.Add(new Structural.Composite.FileSystem.File("resume.docx"));
+            docs.Add(new Structural.Composite.FileSystem.File("budget.xlsx"));
+
+            pics.Add(new Structural.Composite.FileSystem.File("pic.png"));
+            pics.Add(new Structural.Composite.FileSystem.File("pic.jpeg"));
+
+            root.Add(docs);
+            root.Add(pics);
+            root.Add(new Structural.Composite.FileSystem.File("todo.txt"));
+            root.Print();
+        }
+            
         #endregion
 
         #endregion
