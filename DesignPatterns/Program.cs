@@ -11,6 +11,8 @@ using DesignPatterns.Structural.Adapter.Logger;
 using DesignPatterns.Structural.Bridge.Shape;
 using DesignPatterns.Structural.Composite.FileSystem;
 using DesignPatterns.Structural.Composite.GraphicGroups;
+using DesignPatterns.Structural.Decorator.Message;
+using DesignPatterns.Structural.Decorator.Stream;
 
 namespace DesignPatterns
 {
@@ -47,6 +49,9 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             WorkWithComposite();
+            Console.WriteLine(new string('_', 50));
+
+            WorkWithDecorator();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -273,7 +278,36 @@ namespace DesignPatterns
             root.Add(new Structural.Composite.FileSystem.File("todo.txt"));
             root.Print();
         }
-            
+
+        #endregion
+
+        #region Decorator
+
+        //Позволяет добавлять объекту новое поведение на лету, не изменяя его класс и не создавая множество подклассов.
+        //Вместо создания множества наследников создается обёртки вокруг объекта, каждая из которых расширяет его функциональность
+        //При этом объект и его обёртки реализуют один и тот же интерфейс.
+        //Гибкая и поэтапная обертка объектов
+
+        public static void WorkWithDecorator()
+        {
+            Structural.Decorator.Message.IMessage message = new SimpleMessage("Hello world");
+
+            message = new HtmlDecorator(message);
+            Console.WriteLine(message.GetContent());
+
+            message = new EncryptedDecorator(message);
+            Console.WriteLine(message.GetContent());
+
+            Console.WriteLine();
+
+            IStream stream = new Structural.Decorator.Stream.FileStream();
+            stream = new CompressionStream(stream);     
+            stream = new EncryptionStream(stream);      
+            stream = new LoggingStream(stream);        
+            stream.Write("Hello, world!");
+
+        }
+
         #endregion
 
         #endregion
