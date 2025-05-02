@@ -28,34 +28,34 @@ namespace DesignPatterns
 
         static void Main(string[] args)
         {
-            WorkWithSingleton();
+            SingletonWork();
 
             Console.WriteLine(new string('_', 50));
 
-            WorkWithFactoryMethod();
+            FactoryMethodWork();
 
             Console.WriteLine(new string('_', 50));
 
-            WorkWithBuilder();
+            BuilderWork();
 
             Console.WriteLine(new string('_', 50));
 
-            WorkWithPrototype();
+            PrototypeWork();
             Console.WriteLine(new string('_', 50));
 
-            WorkWithAdapter();
+            AdapterWork();
             Console.WriteLine(new string('_', 50));
 
-            WorkWithBridge();
+            BridgeWork();
             Console.WriteLine(new string('_', 50));
 
-            WorkWithComposite();
+            CompositeWork();
             Console.WriteLine(new string('_', 50));
 
-            WorkWithDecorator();
+            DecoratorWork();
             Console.WriteLine(new string('_', 50));
 
-            WorkWithFacade();
+            FacadeWork();
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
@@ -68,7 +68,7 @@ namespace DesignPatterns
         //Пример, когда нужен только один обьект: логгер, конфигурация, кэш, подключение к б.д. и т.д.)
         //Когда глобальное состояние оправдано
 
-        static void WorkWithSingleton()
+        static void SingletonWork()
         {
             Singleton.Instance.SayHello();
             ThreadSafeSingleton.Instance.SayHello();
@@ -106,7 +106,7 @@ namespace DesignPatterns
         //Я делаю расширяемый фреймворк	        🤝 часто используется внутри	✅ фабрики — основной способ подмены
 
 
-        public static void WorkWithFactoryMethod()
+        static void FactoryMethodWork()
         {
             MessageCreator creator = new EmailMessageCreator();
             var message = creator.CreateMessage();
@@ -121,7 +121,7 @@ namespace DesignPatterns
         //когда нужно гибко настраиват обьект без длинного конструктора (более 10 аргументов).
         //когда нужно повторно использовать одну и ту же схему построения, но с разными конфигурациями.
 
-        public static void WorkWithBuilder()
+        static void BuilderWork()
         {
             var user = new UserBuilder() //Плавный интерфейс. Цепочка вызовов, которая работает из-за return this.
                 .SetName("Igor")
@@ -160,7 +160,7 @@ namespace DesignPatterns
         //Используется когда создание нового обьекта слишком дорого (глубокая инициализация),
         //Когда нужно клонировать обьект с небольшими изменениями.
         //Когда нужно копировать структуру, но не использовать new напрямую
-        public static void WorkWithPrototype()
+        static void PrototypeWork()
         {
             var original = new Report
             {
@@ -218,7 +218,7 @@ namespace DesignPatterns
         // Пример с переходником
         //Когда использовать: нельзя изменить сторонний код, клиент ждет нужный интефрейс, хочешь внедрить в систему чужой обьект
 
-        public static void WorkWithAdapter()
+        static void AdapterWork()
         {
             ILogger logger = new LoggerAdapter(new ExternalLogger());     //Реализуем интерфейс в классе адаптер, а класс адаптер использует внешний класс.
             logger.Log("Приложение запущено");
@@ -231,7 +231,7 @@ namespace DesignPatterns
         //"Есть интерфейс и есть разные реализации - но нет необходимости жестко их связывать"
         //Паттерн позволяет гибко и независимо их комбинировать
 
-        public static void WorkWithBridge()
+        static void BridgeWork()
         {
             IRenderer vector = new VectorRenderer();    //Можно добавлять новые фигуры, можно добавлять новые способы отрисовки. Гибко и без дублирования
             Shape circle = new Structural.Bridge.Shape.Circle(vector, 5);
@@ -252,7 +252,7 @@ namespace DesignPatterns
             //Кнопка, лейбл, ТекстБокс в Панели. Файл и Папка. Иерархия сотрудников. (Дерево)
             //Элемент и группа реализуют один и тот же интерфейс, а клиентский код не отличает "лист" от "состава"
             //Используется когда иерархия объектов, когда нужно вложить объекты друг в друга, когда нужен единый интерфейс для элементов и контейнеров
-        public static void WorkWithComposite()
+        static void CompositeWork()
         {
             var circle = new Structural.Composite.GraphicGroups.Circle();
             var square = new Square();
@@ -292,7 +292,7 @@ namespace DesignPatterns
         //При этом объект и его обёртки реализуют один и тот же интерфейс.
         //Гибкая и поэтапная обертка объектов
 
-        public static void WorkWithDecorator()
+        static void DecoratorWork()
         {
             Structural.Decorator.Message.IMessage message = new SimpleMessage("Hello world");
 
@@ -322,7 +322,7 @@ namespace DesignPatterns
 
         // Используется когда: много компонентов, нет необходимости знать реализацию, необходимо облегчить использование системы, ограничить доступ к внутренним частям
         //Частный случай вью модели может выступать в роли фасада.
-        public static void WorkWithFacade()
+        static void FacadeWork()
         {
             var theater = new HomeTheaterFacade(new Projector(), new SoundSystem(), new Screen());
             theater.WatchMovie("Interstellar");
@@ -346,7 +346,7 @@ namespace DesignPatterns
         //Когда поведение нужно менять не лету (сортировка, логирование, фильтрация)
         //Когда нужен чистый и расширяемый код, соответсующий OCP
 
-        public static void StrategyWork()
+        static void StrategyWork()
         {
             PaymentProcessor processor = new PaymentProcessor();
             processor.SetStrategy(new CardPayment());
