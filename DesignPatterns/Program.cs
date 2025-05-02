@@ -1,4 +1,7 @@
-﻿using DesignPatterns.Behavioral.Strategy.Payment;
+﻿using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
+using DesignPatterns.Behavioral.Observer.EventsObserver;
+using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
+using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
 using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
@@ -59,6 +62,10 @@ namespace DesignPatterns
             Console.WriteLine(new string('_', 50));
 
             StrategyWork();
+            Console.WriteLine(new string('_', 50));
+
+            ObserverWork();
+            Console.WriteLine(new string('_', 50));
         }
 
         #region Порождающие
@@ -402,6 +409,49 @@ namespace DesignPatterns
         //Там где сложная логика, как с оплатой, используем интерфейсы, там где простая как с фильтрацией - func, action
         //Если думаешь: "Тут логики столько, что в одну лямбду не влезет...", значит, лучше использовать интерфейс и выделенный класс.
 
+        #endregion
+
+        #region Observer
+        //Позволяет объектам подписываться на события другого объекта и получать уведомления при его изменении
+        //В MVVM - Subject(наблюдаемый) - ViewModel, реализующий INotifyPropertyChanged, Observers (наблюдатели) - элементы UI, подписанные через привязки.
+        //В .NET события и делегаты реализуют Observer
+
+        //| Когда использовать                | `Action<T>`    | `EventHandler<T>`      |
+        //| --------------------------------- | -------------  | ---------------------- |
+        //| Быстро, просто, без sender        | + Подходит     | - Не подходит          |
+        //| Нужно указать, кто вызвал событие | - Нет sender   | + Есть sender          |
+        //| Используешь UI / стандартные API  | - Не принято   | + Принято              |
+        //| Хочешь единый подход для событий  | - Разрозненно  | + Принцип единообразия |
+
+
+        static void ObserverWork()
+        {
+            //Просто действие
+            var sensor = new TemperatureSensor();
+            var app = new MobileApp();
+            var logger = new TemperatureLogger();
+
+            sensor.Attach(app);
+            sensor.Attach(logger);
+
+            sensor.SetTemperature(22.5f);
+            sensor.SetTemperature(24.0f);
+            //Event Action
+            var sen = new AnotherTemperatureSensor();
+            var ap = new AnotherMobileApp();
+            var log = new AnotherTemperatureLogger();
+            sen.TemperatureChanged += ap.OnTemperatureChanged;
+            sen.TemperatureChanged += log.OnTemperatureChanged;
+            sen.SetTemperature(21.5f);
+            sen.SetTemperature(21.0f);
+
+            //EventHandler и EventArgs
+            var account = new BankAccount();
+            var notifier = new BalanceNotifier();
+            account.BalanceChanged += notifier.OnBalanceChanged;
+            account.Deposit(100);
+
+        }
         #endregion
 
         #endregion
