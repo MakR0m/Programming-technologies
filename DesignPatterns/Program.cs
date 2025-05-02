@@ -1,4 +1,5 @@
-﻿using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
+﻿using DesignPatterns.Behavioral.Command.Light;
+using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
 using DesignPatterns.Behavioral.Observer.EventsObserver;
 using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
 using DesignPatterns.Behavioral.Strategy.Payment;
@@ -17,6 +18,7 @@ using DesignPatterns.Structural.Composite.GraphicGroups;
 using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
 using DesignPatterns.Structural.Facade.HomeTheaterFacade;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DesignPatterns
 {
@@ -31,42 +33,28 @@ namespace DesignPatterns
 
         static void Main(string[] args)
         {
-            SingletonWork();
-
-            Console.WriteLine(new string('_', 50));
-
-            FactoryMethodWork();
-
-            Console.WriteLine(new string('_', 50));
-
-            BuilderWork();
-
-            Console.WriteLine(new string('_', 50));
-
-            PrototypeWork();
-            Console.WriteLine(new string('_', 50));
-
-            AdapterWork();
-            Console.WriteLine(new string('_', 50));
-
-            BridgeWork();
-            Console.WriteLine(new string('_', 50));
-
-            CompositeWork();
-            Console.WriteLine(new string('_', 50));
-
-            DecoratorWork();
-            Console.WriteLine(new string('_', 50));
-
-            FacadeWork();
-            Console.WriteLine(new string('_', 50));
-
-            StrategyWork();
-            Console.WriteLine(new string('_', 50));
-
-            ObserverWork();
-            Console.WriteLine(new string('_', 50));
+            var actions = new List<Action>() 
+            {
+                SingletonWork,
+                FactoryMethodWork,
+                BuilderWork,
+                PrototypeWork,
+                AdapterWork,
+                BridgeWork,
+                CompositeWork,
+                DecoratorWork,
+                FacadeWork,
+                StrategyWork,
+                ObserverWork,
+                CommandWork
+            };
+            foreach (var action in actions)
+            {
+                action();
+                Console.WriteLine(new string('_', 50));
+            }
         }
+
 
         #region Порождающие
 
@@ -452,6 +440,32 @@ namespace DesignPatterns
             account.Deposit(100);
 
         }
+        #endregion
+
+        #region Command
+        //Преобразует действие (запрос) в объект, позволяя: ставить в очередь, отменять, логировать и передавать как параметр.
+        //Запрос - это объект, а не просто вызов метода
+        //Основные участники:
+        //Command - ICommand (интерфейс команды),
+        //ConcreteCommand - CopyCommand, PasteCommand, PrintCommand,
+        //Receiver - То, над чем выполняется действие (например, документ)
+        //Invoker - Объект, который вызывает команды (например, кнопка)
+        //Client - Конфигурирует команды и вызывает Invoker.Execute()
+        //Применение: интерфейс ICommand (для команд MVVM), очереди задач (TaskQueue), макрокоманды, отложенные действия, отмена (Undo)
+
+        static void CommandWork()
+        {
+            var light = new Light();
+            var turnOn = new TurnOnCommand(light);
+            var turnOff = new TurnOffCommand(light);
+            var remote = new RemoteControl();
+            remote.SetCommand(turnOn);
+            remote.Undo();
+
+            remote.SetCommand(turnOff);
+            remote.Undo();
+        }
+
         #endregion
 
         #endregion
