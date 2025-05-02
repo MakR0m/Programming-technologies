@@ -2,6 +2,7 @@
 using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
 using DesignPatterns.Behavioral.Observer.EventsObserver;
 using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
+using DesignPatterns.Behavioral.State.MediaPlayer;
 using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
 using DesignPatterns.Creational.Builder.HttpRequest;
@@ -46,7 +47,8 @@ namespace DesignPatterns
                 FacadeWork,
                 StrategyWork,
                 ObserverWork,
-                CommandWork
+                CommandWork,
+                StateWork
             };
             foreach (var action in actions)
             {
@@ -464,6 +466,26 @@ namespace DesignPatterns
 
             remote.SetCommand(turnOff);
             remote.Undo();
+        }
+
+        #endregion
+
+        #region State 
+        //Позволяет объекту изменять свое поведение в зависимости от текущего состояния, при этом внешне он остаётся тем же самым объектом
+        //Поведение объекта делегируется состоянию, и это поведение может меняться в рантайме.
+        //Участники:
+        //Context - Основной объект, делегирующий поведение,
+        //State - Интерфейс состояния
+        //ConcreteState - Конкретная реализация состояния
+        //Применение: банкоматы, автоматы, диалоги; UI - компоненты с режимами; Игровые персонажи: бег, прыжок, урон; Заказы (черновик - в обработке - завершен)
+        static void StateWork()
+        {
+            var player = new MPlayer(new StoppedState());
+            player.PressButton(); // Воспроизведение начато
+            player.PressButton(); // Проигрывание приостановлено
+            player.PressButton(); // Возобновление воспроизведения
+            player.PressButton(); // Проигрывание приостановлено
+
         }
 
         #endregion
