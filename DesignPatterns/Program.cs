@@ -7,6 +7,7 @@ using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
 using DesignPatterns.Behavioral.State.MediaPlayer;
 using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
+using DesignPatterns.Behavioral.TemplateMethod;
 using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
@@ -51,7 +52,8 @@ namespace DesignPatterns
                 ObserverWork,
                 CommandWork,
                 StateWork,
-                ChainOfResponsibilityWork
+                ChainOfResponsibilityWork,
+                TemplateMethodWork
             };
             foreach (var action in actions)
             {
@@ -526,6 +528,25 @@ namespace DesignPatterns
 
             var request = new Request("Рома", isAuthenticated: true, hasPermission: true, isWithinLimit: false);
             auth.Handle(request);
+        }
+        #endregion
+
+        #region TemplateMethod
+        //Определяет скелет алгоритма в базовом классе, позволяя подклассам переопределять отдельные шаги, не меняя саму структуру алгоритма
+        //Общий алгоритм приготовления чая: вскипятить воду, заварить напиток (можно по-разному), налить в чашку, добавить добавки (в зависимости от напитка)
+        //Алгоритм общий, но отдельные шаги можно изменять
+        //Участники:
+        //AbstractClass - хранит общий алгоритм (шаблонный метод)
+        //ConcreteClass - переопределяет отдельные шаги
+        //Шаги алгоритма - обычные или virtual/abstract методы
+        static void TemplateMethodWork()
+        {
+            var tea = new Tea();
+            tea.Prepare();
+            Console.WriteLine();
+            var coffee = new Coffee();
+            coffee.Prepare();
+
         }
         #endregion
 
