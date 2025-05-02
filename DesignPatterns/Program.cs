@@ -1,4 +1,6 @@
-﻿using DesignPatterns.Behavioral.Command.Light;
+﻿using DesignPatterns.Behavioral.ChainOfResponsibility.Loggers;
+using DesignPatterns.Behavioral.ChainOfResponsibility.UserValidation;
+using DesignPatterns.Behavioral.Command.Light;
 using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
 using DesignPatterns.Behavioral.Observer.EventsObserver;
 using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
@@ -48,7 +50,8 @@ namespace DesignPatterns
                 StrategyWork,
                 ObserverWork,
                 CommandWork,
-                StateWork
+                StateWork,
+                ChainOfResponsibilityWork
             };
             foreach (var action in actions)
             {
@@ -488,6 +491,42 @@ namespace DesignPatterns
 
         }
 
+        #endregion
+
+        #region ChainOfResponsibility
+        //Позволяет передавать запрос по цепочке объектов, пока один из них не обработает его
+        //Каждый обработчик решает обработать сам или передать дальше
+        //Участники:
+        //Handler - интерфейс обработчика
+        //ConcreteHandler - SupportAgent, Supervisor (конкретный исполнитель запроса)
+        //Client - отправляет запрос в начало цепочки
+        //Применение - Middleware в ASP.NET Core, обработка ошибок, фильтрация логов, разрешения/автоматизация
+        static void ChainOfResponsibilityWork()
+        {
+            //Пример с логгером. Info - обрабатывает ConsoleLogger, WARN - FileLogger, ERROR - EmailLogger.
+            //У каждого логгера, есть ссылка на следующий логгер и в случае, если он не может обработать этот запрос, он передает его дальше
+            //Новый логгер можно добавить без изменения остального кода
+            var console = new ConsoleLogger();
+            var file = new FileLogger();
+            var email = new EmailLogger();
+            console.SetNext(file);
+            file.SetNext(email);
+            console.Log(LogLevel.Info, "Система запущена");
+            console.Log(LogLevel.Warning, "Низкий уровень памяти");
+            console.Log(LogLevel.Error, "Ошибка подключения к базе");
+
+            Console.WriteLine();
+
+            var auth = new AuthHandler();
+            var permission = new PermissionHandler();
+            var limit = new LimitHandler();
+
+            auth.SetNext(permission);
+            permission.SetNext(limit);
+
+            var request = new Request("Рома", isAuthenticated: true, hasPermission: true, isWithinLimit: false);
+            auth.Handle(request);
+        }
         #endregion
 
         #endregion
