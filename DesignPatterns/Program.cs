@@ -8,6 +8,7 @@ using DesignPatterns.Behavioral.State.MediaPlayer;
 using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
 using DesignPatterns.Behavioral.TemplateMethod;
+using DesignPatterns.Behavioral.Visitor.Shapes;
 using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
@@ -22,7 +23,7 @@ using DesignPatterns.Structural.Composite.GraphicGroups;
 using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
 using DesignPatterns.Structural.Facade.HomeTheaterFacade;
-using System.Security.Cryptography.X509Certificates;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DesignPatterns
 {
@@ -53,7 +54,8 @@ namespace DesignPatterns
                 CommandWork,
                 StateWork,
                 ChainOfResponsibilityWork,
-                TemplateMethodWork
+                TemplateMethodWork,
+                VisitorWork
             };
             foreach (var action in actions)
             {
@@ -547,6 +549,33 @@ namespace DesignPatterns
             var coffee = new Coffee();
             coffee.Prepare();
 
+        }
+        #endregion
+
+        #region Visitor
+        //Позволяет добавлять новые операции к группе объектов, не изменяя их классы и при этом разделяет структуру и поведение
+        //Что раньше было внутри if (obj is ...) - можно вынести в отдельный класс-посетитель
+        //Пример: есть разные элементы документа: Text, Image, Table. Мы хотим: экспортировать их в PDF, отобразить на экране или посчитать объем данных
+        //Вместо того, чтобы в каждом классе писать ExportToPdf можно сделать это извне Visitor`ом, посещая каждый элемент
+        //| Участник            | Роль                                                   |
+        //| ------------------- | ------------------------------------------------------ |
+        //| Element             | Интерфейс для объектов структуры                       |
+        //| ConcreteElement     | Конкретный класс объекта(`Text`, `Image`)              |
+        //| Visitor             | Интерфейс посетителя                                   |
+        //| ConcreteVisitor     | Реализация действий(`RenderVisitor`, `ExportVisitor`)  |
+        static void VisitorWork()
+        {
+            var shapes = new List<IShape>
+            {
+                new Behavioral.Visitor.Shapes.Circle(5),
+                new Rectangle(4,6)
+            };
+
+            var areaVisitor = new AreaCalculator();
+            foreach (var shape in shapes)
+            {
+                shape.Accept(areaVisitor);
+            }
         }
         #endregion
 
