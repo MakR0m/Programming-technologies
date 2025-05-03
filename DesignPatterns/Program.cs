@@ -28,7 +28,7 @@ using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
 using DesignPatterns.Structural.Facade.HomeTheaterFacade;
 using DesignPatterns.Structural.Proxy.Logging;
-using static System.Net.Mime.MediaTypeNames;
+using System.Reflection;
 
 namespace DesignPatterns
 {
@@ -69,6 +69,8 @@ namespace DesignPatterns
             };
             foreach (var action in actions)
             {
+                Console.WriteLine(action.GetMethodInfo());
+                Console.WriteLine();
                 action();
                 Console.WriteLine(new string('_', 50));
             }
