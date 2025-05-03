@@ -13,6 +13,8 @@ using DesignPatterns.Behavioral.Strategy.Payment;
 using DesignPatterns.Behavioral.Strategy.ProductFilter;
 using DesignPatterns.Behavioral.TemplateMethod;
 using DesignPatterns.Behavioral.Visitor.Shapes;
+using DesignPatterns.Creational.AbstractFactory.GUI;
+using DesignPatterns.Creational.AbstractFactory.Services;
 using DesignPatterns.Creational.Builder.HttpRequest;
 using DesignPatterns.Creational.Builder.UserExample;
 using DesignPatterns.Creational.FactoryMethod.MessageFabric;
@@ -65,7 +67,8 @@ namespace DesignPatterns
                 MementoWork,
                 IteratorWork,
                 InterpreterWork,
-                ProxyWork
+                ProxyWork,
+                AbstractFactoryWork
             };
             foreach (var action in actions)
             {
@@ -220,6 +223,34 @@ namespace DesignPatterns
 
 
         }
+
+        #endregion
+
+        #region AbstractFactory
+        //Позволяет создавать семейства связанных объектов, не указывая их конкретные классы
+        //Пример: создаем UI, и в зависимости от платформы (Win, Mac) нужны разные кнопки, окна, меню, но с единым интерфейсом
+        //Есть семейства интерфейсов: IButton, ICheckBox и их реализация под разные ОС: WinButton, MacButton, WinCheckBox, MacCheckbox.
+        //Создаем одну фабрику на все семейство.
+        //| Компонент                  | Роль                                     |
+        //| -------------------------- | ---------------------------------------- |
+        //| `IButton`, `ICheckbox`     | Интерфейсы продуктов                     |
+        //| `IGUIFactory`              | Интерфейс фабрики                        |
+        //| `WinFactory`, `MacFactory` | Конкретные фабрики, создающие семейства  |
+        //| `Application`              | Клиент, использующий абстрактную фабрику |
+        static void AbstractFactoryWork()
+        {
+            IGUIFactory factory = new WinFactory();
+            var app = new Application(factory);
+            app.RenderUI();
+
+            Console.WriteLine();
+            //Фабрика сервисов
+            IServiceFactory factory1 = new ProductionServiceFactory();
+            var processor = new OrderProcessor(factory1);
+            processor.ProcessOrder("asd@example.com", 3999);
+
+        }
+        //Используется когда нужно создавать семейства объектов, платформозависимые/конфигурационные различия или нужно изолировать код от конкретных классов.
 
         #endregion
 
