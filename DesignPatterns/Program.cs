@@ -27,6 +27,7 @@ using DesignPatterns.Structural.Composite.GraphicGroups;
 using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
 using DesignPatterns.Structural.Facade.HomeTheaterFacade;
+using DesignPatterns.Structural.Proxy.Logging;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DesignPatterns
@@ -63,7 +64,8 @@ namespace DesignPatterns
                 MediatorWork,
                 MementoWork,
                 IteratorWork,
-                InterpreterWork
+                InterpreterWork,
+                ProxyWork
             };
             foreach (var action in actions)
             {
@@ -339,6 +341,24 @@ namespace DesignPatterns
             var theater = new HomeTheaterFacade(new Projector(), new SoundSystem(), new Screen());
             theater.WatchMovie("Interstellar");
         }
+        #endregion
+
+        #region Proxy
+        //Создаёт объект - "Заместитель", который контролирует доступ к другому объекту (настоящему или тяжёлому), добавляя дополнительную логику.
+        //Пример: есть бд и чтобы не обращаться к ней каждый раз для получения прав доступа используется прокси, который кеширует или проверяет права доступа
+        //| Вид              | Что делает                                            |
+        //| ---------------- | ----------------------------------------------------- |
+        //| Virtual Proxy    | Ленивая инициализация, отложенная загрузка            |
+        //| Protection Proxy | Проверка прав доступа перед вызовом                   |
+        //| Remote Proxy     | Обращение к удалённому объекту(например, через сеть)  |
+        //| Cache Proxy      | Кэширует результат работы реального объекта           |
+        //| Logging Proxy    | Логирует вызовы к реальному объекту                   |
+        static void ProxyWork()
+        {
+            IService service = new LoggingProxy();
+            service.Request();
+        }
+        //Используется, когда: объект тяжелый (создавать при необходимости), нужен кэш,лог, права доступа, объект может быть удалённым (через сеть)
         #endregion
 
         #endregion
