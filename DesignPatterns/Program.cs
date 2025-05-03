@@ -29,6 +29,7 @@ using DesignPatterns.Structural.Composite.GraphicGroups;
 using DesignPatterns.Structural.Decorator.Message;
 using DesignPatterns.Structural.Decorator.Stream;
 using DesignPatterns.Structural.Facade.HomeTheaterFacade;
+using DesignPatterns.Structural.Flyweight.Text;
 using DesignPatterns.Structural.Proxy.Logging;
 using System.Reflection;
 
@@ -68,7 +69,8 @@ namespace DesignPatterns
                 IteratorWork,
                 InterpreterWork,
                 ProxyWork,
-                AbstractFactoryWork
+                AbstractFactoryWork,
+                FlyweightWork
             };
             foreach (var action in actions)
             {
@@ -392,6 +394,42 @@ namespace DesignPatterns
             service.Request();
         }
         //Используется, когда: объект тяжелый (создавать при необходимости), нужен кэш,лог, права доступа, объект может быть удалённым (через сеть)
+        #endregion
+
+        #region Flyweight
+        //Позволяет экономить память, разделяя общее (повторяющееся) состояние объектов.
+        //Вместо того, чтобы хранить одинаковые данные в каждом объекте, они вносятся в общую "легковесную" структуру, а каждый объект хранит только уникальное.
+        //Пример: в текстовом редакторе каждый символ имеет одинаковый шрифт, цвет и стиль, но отличается позицией.
+        //Вместо множества объектов "А" создается один объект для каждй буквы, и много ссылок на него с разными координатами
+        //| Компонент         | Роль                                           |
+        //| ----------------- | ---------------------------------------------- |
+        //| Flyweight         | Интерфейс легковесного объекта                 |
+        //| ConcreteFlyweight | Реализация общего состояния                    |
+        //| FlyweightFactory  | Управляет созданием/кешем                      |
+        //| Context           | Уникальные данные(координаты, позиция и т.п.)  |
+
+        static void FlyweightWork()
+        {
+            var factory = new CharacterFactory();
+            var positions = new List<(int x, int y)>()
+            {
+                (10, 20),
+                (15, 25),
+                (20, 30),
+                (10, 20) // повторно та же точка
+            };
+
+            foreach (var position in positions)
+            {
+                var character = factory.GetCharacter('A');
+                character.Draw(position.x, position.y);
+            }
+        }
+        //CharacterA создается только один раз
+        //Все координаты - это контекст (внешнее состояние), передаваемый извне
+        //Экономится память, если таких символов - тысячи
+        //Применяется в графике и играх (частицы, пули, деревья, враги), редакторах текста (символы и стили), кеш данных (повторяющиеся настройки, шаблоны), CAD/3D (повторяющиеся объекты)
+
         #endregion
 
         #endregion
