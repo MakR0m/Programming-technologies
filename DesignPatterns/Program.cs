@@ -2,6 +2,7 @@
 using DesignPatterns.Behavioral.ChainOfResponsibility.UserValidation;
 using DesignPatterns.Behavioral.Command.Light;
 using DesignPatterns.Behavioral.Mediator.Chat;
+using DesignPatterns.Behavioral.Memento.Text;
 using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
 using DesignPatterns.Behavioral.Observer.EventsObserver;
 using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
@@ -57,7 +58,8 @@ namespace DesignPatterns
                 ChainOfResponsibilityWork,
                 TemplateMethodWork,
                 VisitorWork,
-                MediatorWork
+                MediatorWork,
+                MementoWork
             };
             foreach (var action in actions)
             {
@@ -604,6 +606,40 @@ namespace DesignPatterns
             chat.Register(clara);
 
             alice.Send("Hello!");
+        }
+
+        #endregion
+
+        #region Memento
+        //Позволяет сохранять и восстанавливать состояние объекта без нарушения инкапсуляции
+        //Основа для Undo, Redo, временных откатов, черновиков, автосохранений. Пример: Ctrl+Z
+        //Участники:
+        //| Роль        | Описание                                     |
+        //| ----------- | -------------------------------------------- |
+        //| Originator  | Объект, чьё состояние сохраняется            |
+        //| Memento     | Снимок состояния(обычно неизменяемый)        |
+        //| Caretaker   | Хранит историю снимков(например, стек Undo)  |
+        //Когда: нужно реализовать Undo/Redo, нужно сохранить временное состояние, важна инкапсуляция
+        static void MementoWork()
+        {
+            var editor = new TextEditor();
+            var history = new History();
+            editor.Text = "Version 1";
+            history.Backup(editor.Save());
+
+            editor.Text = "Version 2";
+            history.Backup(editor.Save());
+
+            editor.Text = "Version 3";
+
+            Console.WriteLine($"Текущий текст: {editor.Text}"); // Версия 3
+
+            editor.Restore(history.Undo());
+
+            Console.WriteLine($"Откат: {editor.Text}");         // Версия 2
+
+            editor.Restore(history.Undo());
+            Console.WriteLine($"Откат: {editor.Text}");         // Версия 1
         }
 
         #endregion
