@@ -1,6 +1,7 @@
 ﻿using DesignPatterns.Behavioral.ChainOfResponsibility.Loggers;
 using DesignPatterns.Behavioral.ChainOfResponsibility.UserValidation;
 using DesignPatterns.Behavioral.Command.Light;
+using DesignPatterns.Behavioral.Mediator.Chat;
 using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
 using DesignPatterns.Behavioral.Observer.EventsObserver;
 using DesignPatterns.Behavioral.Observer.ObserverWithoutEvents;
@@ -38,7 +39,7 @@ namespace DesignPatterns
 
         static void Main(string[] args)
         {
-            var actions = new List<Action>() 
+            var actions = new List<Action>()
             {
                 SingletonWork,
                 FactoryMethodWork,
@@ -55,7 +56,8 @@ namespace DesignPatterns
                 StateWork,
                 ChainOfResponsibilityWork,
                 TemplateMethodWork,
-                VisitorWork
+                VisitorWork,
+                MediatorWork
             };
             foreach (var action in actions)
             {
@@ -240,9 +242,9 @@ namespace DesignPatterns
             IRenderer vector = new VectorRenderer();    //Можно добавлять новые фигуры, можно добавлять новые способы отрисовки. Гибко и без дублирования
             Shape circle = new Structural.Bridge.Shape.Circle(vector, 5);
             circle.Draw();
-                                                        //Просто использовать интерфейс - это инверсия зависимостей,
-                                                        //а мост - это структура в которой абстракция содержит ссылку на реализацию и они развиваются независимо.
-                                                        //В данном случае мост это поле типа интерфейса в абстрактном классе shape
+            //Просто использовать интерфейс - это инверсия зависимостей,
+            //а мост - это структура в которой абстракция содержит ссылку на реализацию и они развиваются независимо.
+            //В данном случае мост это поле типа интерфейса в абстрактном классе shape
             IRenderer raster = new RasterRenderer();
             Shape circle2 = new Structural.Bridge.Shape.Circle(raster, 10);
             circle2.Draw();
@@ -250,12 +252,12 @@ namespace DesignPatterns
         #endregion
 
         #region Composite (Компоновщик)
-            //Позволяет обращаться к отдельным объектам и их композициям (деревьям) одинаково - через общий интерфейс.
-            //Есть один элемент (например, кнопка). Есть контейнер, в котором могут быть другие кнопки, поля или даже другие контейнеры.
-            //Компоновщик позволяет работать с ними как с одним и тем же типом.
-            //Кнопка, лейбл, ТекстБокс в Панели. Файл и Папка. Иерархия сотрудников. (Дерево)
-            //Элемент и группа реализуют один и тот же интерфейс, а клиентский код не отличает "лист" от "состава"
-            //Используется когда иерархия объектов, когда нужно вложить объекты друг в друга, когда нужен единый интерфейс для элементов и контейнеров
+        //Позволяет обращаться к отдельным объектам и их композициям (деревьям) одинаково - через общий интерфейс.
+        //Есть один элемент (например, кнопка). Есть контейнер, в котором могут быть другие кнопки, поля или даже другие контейнеры.
+        //Компоновщик позволяет работать с ними как с одним и тем же типом.
+        //Кнопка, лейбл, ТекстБокс в Панели. Файл и Папка. Иерархия сотрудников. (Дерево)
+        //Элемент и группа реализуют один и тот же интерфейс, а клиентский код не отличает "лист" от "состава"
+        //Используется когда иерархия объектов, когда нужно вложить объекты друг в друга, когда нужен единый интерфейс для элементов и контейнеров
         static void CompositeWork()
         {
             var circle = new Structural.Composite.GraphicGroups.Circle();
@@ -264,11 +266,11 @@ namespace DesignPatterns
             var group = new GraphicGroup();
             group.Add(circle);
             group.Add(square);
-            
+
             var superGroup = new GraphicGroup();
             superGroup.Add(group);
             superGroup.Add(new Square());
-            
+
             superGroup.Draw();
 
             var root = new Folder("Root");
@@ -309,9 +311,9 @@ namespace DesignPatterns
             Console.WriteLine();
 
             IStream stream = new Structural.Decorator.Stream.FileStream();
-            stream = new CompressionStream(stream);     
-            stream = new EncryptionStream(stream);      
-            stream = new LoggingStream(stream);        
+            stream = new CompressionStream(stream);
+            stream = new EncryptionStream(stream);
+            stream = new LoggingStream(stream);
             stream.Write("Hello, world!");
 
         }
@@ -384,7 +386,7 @@ namespace DesignPatterns
 
             filter.SetStrategy(new CategoryFilter("Бытовая техника"));
             var secondCategory = filter.FilterWithInterfaces(products);
-            
+
             Console.WriteLine("Бытовая техника");                     //Where ленивый оператор, он вызывается не выше, а в фориче. Для того, чтобы вызвать сразу можно .ToList();
             foreach (var product in secondCategory)                   //Если вызывать потом все вместе, то везде сработает последний сет фильтр
                 Console.WriteLine(product);
@@ -577,6 +579,33 @@ namespace DesignPatterns
                 shape.Accept(areaVisitor);
             }
         }
+        #endregion
+
+        #region Mediator
+        //Позволяет объектам общаться друг с другом не напрямую, а через посредника, снижая связанность между ними
+        //Полезен, когда много компонентов взаимодействуют между собой (окна UI, формы, чаты, контролы).
+        //Пример: есть группа пользователей в чате. Вместо того чтобы каждый отправлял сообщение всем вручную, они отправляют его через ChatRoom(посредник), и он рассылает остальным.
+        //Участники:
+        //| Роль                  | Пример                                         |
+        //| --------------------- | ---------------------------------------------- |
+        //| Mediator              | Интерфейс посредника                           |
+        //| ConcreteMediator      | Конкретная реализация(`ChatRoom`)              |
+        //| Colleague             | Компоненты, взаимодействующие через посредника |
+        //| ConcreteColleague     | Пользователь, форма, контрол и т.д.            |
+        static void MediatorWork()
+        {
+            var chat = new ChatRoom();
+            var alice = new ChatUser("Alice", chat);
+            var bob = new ChatUser("Bob",chat);
+            var clara = new ChatUser("Clara", chat);
+
+            chat.Register(alice);
+            chat.Register(bob);
+            chat.Register(clara);
+
+            alice.Send("Hello!");
+        }
+
         #endregion
 
         #endregion
