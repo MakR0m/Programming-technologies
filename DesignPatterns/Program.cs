@@ -1,6 +1,7 @@
 ﻿using DesignPatterns.Behavioral.ChainOfResponsibility.Loggers;
 using DesignPatterns.Behavioral.ChainOfResponsibility.UserValidation;
 using DesignPatterns.Behavioral.Command.Light;
+using DesignPatterns.Behavioral.Iterator.Collection;
 using DesignPatterns.Behavioral.Mediator.Chat;
 using DesignPatterns.Behavioral.Memento.Text;
 using DesignPatterns.Behavioral.Observer.EventHandlerObserver;
@@ -59,7 +60,8 @@ namespace DesignPatterns
                 TemplateMethodWork,
                 VisitorWork,
                 MediatorWork,
-                MementoWork
+                MementoWork,
+                IteratorWork
             };
             foreach (var action in actions)
             {
@@ -642,6 +644,23 @@ namespace DesignPatterns
             Console.WriteLine($"Откат: {editor.Text}");         // Версия 1
         }
 
+        #endregion
+
+        #region Iterator
+        //Позволяет поочерёдно обходить элементы коллекции не раскрывая внутреннее представление этой коллекции.
+        //Удобен когда нужно предоставить пользователю "безопасный и единый" способ обхода
+        static void IteratorWork()
+        {
+            var collection = new MyCollection<string>();
+            collection.Add("a");
+            collection.Add("b");
+            collection.Add("c");
+
+            var iterator = collection.GetIterator();
+            while (iterator.HasNext())
+                Console.WriteLine(iterator.Next());
+        }
+        //Когда нужно контролировать обход (вперёд/назад), иметь несколько итераторов, скрыть структуру коллекции
         #endregion
 
         #endregion
