@@ -1,6 +1,7 @@
 ﻿using DesignPatterns.Behavioral.ChainOfResponsibility.Loggers;
 using DesignPatterns.Behavioral.ChainOfResponsibility.UserValidation;
 using DesignPatterns.Behavioral.Command.Light;
+using DesignPatterns.Behavioral.Interpreter.ArithmeticExpressions;
 using DesignPatterns.Behavioral.Iterator.Collection;
 using DesignPatterns.Behavioral.Mediator.Chat;
 using DesignPatterns.Behavioral.Memento.Text;
@@ -61,7 +62,8 @@ namespace DesignPatterns
                 VisitorWork,
                 MediatorWork,
                 MementoWork,
-                IteratorWork
+                IteratorWork,
+                InterpreterWork
             };
             foreach (var action in actions)
             {
@@ -661,6 +663,27 @@ namespace DesignPatterns
                 Console.WriteLine(iterator.Next());
         }
         //Когда нужно контролировать обход (вперёд/назад), иметь несколько итераторов, скрыть структуру коллекции
+        #endregion
+
+        #region Interpreter
+        //Определяет грамматику простого языка и создаёт свой интерпретатор, который выполняет выражения этого языка
+        //Пример калькулятор: (5+3)+(2+1) = 11. Каждое число и операция - это выражение, а дерево выражений можно интерпретировать
+        //Участники:
+        //| Участник      | Роль                                      |
+        //| ------------- | ----------------------------------------- |
+        //| `IExpression` | Интерфейс выражения                       |
+        //| `Terminal`    | Число, переменная(конкретный терминал)    |
+        //| `NonTerminal` | Операция(`+`, `-`, `*`, ...)              |
+        //| `Context`     | (опционально) хранит состояние/переменные |
+        //При сложной грамматике лучше использовать парсер/компилятор
+        static void InterpreterWork()
+        {
+            IExpression leftExpr = new Add(new Number(5), new Number(3));
+            IExpression rightExpr = new Add(new Number(2), new Number(1));
+            IExpression finalExpr = new Add(leftExpr,rightExpr);
+            Console.WriteLine($"Result: {finalExpr.Interpret()}");
+        }
+
         #endregion
 
         #endregion
