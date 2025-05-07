@@ -119,33 +119,192 @@ namespace EFPostgreSQL
 
         static async Task Main(string[] args)
         {
-            using var db = new AppDbContext();
+            await RunMenu();
+        }
 
-            var user = new User
+        static async Task RunMenu()
+        {
+            while (true)
             {
-                Name = "Roman",
-                Age = 30,
-                Posts = new List<Post>
-                    {
-                    new Post {Title = "Hello World", Content = "Its My first post!"},
-                    new Post {Title = "Hello ", Content = "Its My second post!"},
-                    }
-            };
+                Console.WriteLine("\nВыберите действие:");
+                Console.WriteLine("1. Добавить пользователя");
+                Console.WriteLine("2. Показать всех пользователей");
+                Console.WriteLine("3. Обновить пользователя");
+                Console.WriteLine("4. Удалить пользователя");
+                Console.WriteLine("5. Добавить пост пользователю");
+                Console.WriteLine("6. Показать посты всех пользователей");
+                Console.WriteLine("7. Обновить пост");
+                Console.WriteLine("8. Удалить пост");
+                Console.WriteLine("9. Очистить базу данных");
+                Console.WriteLine("10. Выход");
+                Console.Write("Ваш выбор: ");
 
-            //Создание новой записи
+                var input = Console.ReadLine();
+
+                using var db = new AppDbContext();
+
+                switch (input)
+                {
+                    case "1": await AddUserAsync(db); break;
+                    case "2": await ShowUsersAsync(db); break;
+                    case "3": await UpdateUserByIdAsync(db); break;
+                    case "4": await DeleteUserByIdAsync(db); break;
+                    case "5": await AddPostAsync(db); break;
+                    case "6": await ShowPostsAsync(db); break;
+                    case "7": await UpdatePostByIdAsync(db); break;
+                    case "8": await DeletePostByIdAsync(db); break;
+                    case "9": await ClearDatabaseAsync(db); break;
+                    case "10": return;
+                    default: Console.WriteLine("Неверный ввод. Повторите попытку."); break;
+                }
+            }
+        }
+
+        static async Task AddUserAsync(AppDbContext db)
+        {
+            Console.Write("Имя пользователя: ");
+            var name = Console.ReadLine();
+            Console.Write("Возраст: ");
+            int.TryParse(name, out int age);
+            var user = new User { Name = name ?? string.Empty, Age = age };
             db.Users.Add(user);
             await db.SaveChangesAsync();
+            Console.WriteLine("Добавлен");
 
-            //Чтение всех записей с постами
-            var usersWithPosts = await db.Users.Include(x => x.Posts).ToListAsync();
+        }
 
-            
-            foreach (var u in usersWithPosts)
+        static async Task ShowUsersAsync(AppDbContext db)
+        {
+            var users = await db.Users.ToListAsync();
+            foreach (var user in users)
+                Console.WriteLine($"{user.Id}: {user.Name}, {user.Age} лет");
+        }
+
+        static async Task UpdateUserByIdAsync(AppDbContext db)
+        {
+            Console.Write("ID пользователя для обновления: ");
+            if (!int.TryParse(Console.ReadLine(), out int id)) return;
+            var user = await db.Users.FindAsync(id);
+            if (user == null)
             {
-                Console.WriteLine($"{u.Name} ({u.Age}) написал {u.Posts.Count} пост(ов):");
-                foreach (var post in u.Posts)
-                    Console.WriteLine($"  - {post.Title}: {post.Content}");
+                Console.WriteLine("User not found");
+                return;
             }
+
+            Console.WriteLine("New name:");
+            user.Name = Console.ReadLine() ?? user.Name;
+            Console.WriteLine("New age:");
+            int.TryParse(Console.ReadLine(), out int newAge);
+            user.Age = newAge;
+            await db.SaveChangesAsync();
+            Console.WriteLine("User updated");
+        }
+
+        static async Task DeleteUserByIdAsync(AppDbContext db)
+        {
+            Console.Write("ID пользователя для удаления: ");
+            if (!int.TryParse(Console.ReadLine(), out int id)) return;
+            var user = await db.Users.FindAsync(id);
+            if ( user == null)
+            {
+                Console.WriteLine("Пользователь не найден.");
+                return;
+            }
+            db.Users.Remove(user);
+            await db.SaveChangesAsync();
+            Console.WriteLine("User was delete");
+        }
+
+        static async Task AddPostAsync(AppDbContext db)
+        {
+            Console.Write("ID пользователя, которому добавить пост: ");
+            int.TryParse(Console.ReadLine(), out int userId);
+            var user = await db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                Console.WriteLine("Пользователь не найден.");
+                return;
+            }
+
+            Console.Write("Заголовок поста: ");
+            var title = Console.ReadLine();
+            Console.Write("Содержание поста: ");
+            var content = Console.ReadLine();
+
+            var post = new Post { Title = title ?? string.Empty, Content = content ?? string.Empty, UserId = userId };
+            db.Posts.Add(post);
+            await db.SaveChangesAsync();
+            Console.WriteLine("Пост добавлен.");
+
+        }
+
+        static async Task ShowPostsAsync(AppDbContext db)
+        {
+            var users = await db.Users.Include(u => u.Posts).ToListAsync();
+            foreach (var user in users)
+            {
+                Console.WriteLine($"{user.Name} ({user.Id}):");
+                foreach (var post in user.Posts)
+                {
+                    Console.WriteLine($" - {post.Id}: {post.Title}: {post.Content}");
+                }
+            }
+        }
+
+        static async Task UpdatePostByIdAsync(AppDbContext db)
+        {
+            Console.Write("ID поста для обновления: ");
+            if (!int.TryParse(Console.ReadLine(), out int id)) return;
+
+            var post = await db.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                Console.WriteLine("Пост не найден.");
+                return;
+            }
+
+            Console.Write("Новый заголовок: ");
+            post.Title = Console.ReadLine() ?? post.Title;
+            Console.Write("Новое содержание: ");
+            post.Content = Console.ReadLine() ?? post.Content;
+            await db.SaveChangesAsync();
+            Console.WriteLine("Пост обновлён.");
+
+        }
+
+        static async Task DeletePostByIdAsync(AppDbContext db)
+        {
+            Console.Write("ID поста для удаления: ");
+            if (!int.TryParse(Console.ReadLine(), out int id)) return;
+
+            var post = await db.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                Console.WriteLine("Пост не найден.");
+                return;
+            }
+
+            db.Posts.Remove(post);
+            await db.SaveChangesAsync();
+            Console.WriteLine("Пост удалён.");
+
+        }
+
+        static async Task ClearDatabaseAsync(AppDbContext db)
+        {
+            Console.Write("Вы уверены, что хотите удалить всех пользователей и посты? (y/n): ");
+            var confirm = Console.ReadLine();
+            if (confirm?.ToLower() != "y")
+            {
+                Console.WriteLine("Операция отменена.");
+                return;
+            }
+
+            db.Posts.RemoveRange(db.Posts);
+            db.Users.RemoveRange(db.Users);
+            await db.SaveChangesAsync();
+            Console.WriteLine("База данных очищена.");
+
         }
     }
 }
