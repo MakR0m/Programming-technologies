@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DesignPatterns", "DesignPat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Concurrency", "Concurrency\Concurrency.csproj", "{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFPostgreSQL", "EFPostgreSQL\EFPostgreSQL.csproj", "{3C0B1213-6D62-4C78-8101-05D2608C6897}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
