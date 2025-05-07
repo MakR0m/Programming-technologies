@@ -1,4 +1,5 @@
 ﻿using EFPostgreSQL.Data;
+using EFPostgreSQL.Migrations;
 using EFPostgreSQL.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
@@ -105,21 +106,46 @@ namespace EFPostgreSQL
         //dotnet ef migrations add Init  - создание миграции (появится папка Migrations)
         //dotnet ef database update      - применение миграции к БД
         //EF запрашивает таблицу _EFMigrationHistory, не находит ее (первый раз) создает, применяет миграцию и завершает процесс
+        //После добавления класса Post, который связан с User используем миграцию для изменения таблицы User и добавления таблицы Post. (ключи настроены в AppDbContext)
+        //dotnet ef migrations add AddPostEntity
+        //dotnet ef database update
+
+        //Изменение имени поля без потери данных. Меняем имя поле в классе. Добавляем новую миграцию: dotnet ef migrations add RenameTittleToTitle.
+        //Открываем файл миграции в папке миграций, ищем методы Up() и Down() и меняем DropColumn|AddColumn на RenameColumn,
+        //если изначально Rename то оставляем и применяем миграцию dotnet ef database update
+
         #endregion
 
 
         static async Task Main(string[] args)
         {
             using var db = new AppDbContext();
-            
+
+            var user = new User
+            {
+                Name = "Roman",
+                Age = 30,
+                Posts = new List<Post>
+                    {
+                    new Post {Title = "Hello World", Content = "Its My first post!"},
+                    new Post {Title = "Hello ", Content = "Its My second post!"},
+                    }
+            };
+
             //Создание новой записи
-            db.Users.Add(new User { Name = "Роман", Age = 30 });
+            db.Users.Add(user);
             await db.SaveChangesAsync();
 
-            //Чтение всех записей
-            var users = await db.Users.ToListAsync();
-            foreach (var user in users)
-                Console.WriteLine($"{user.Id}: {user.Name}, {user.Age} лет");
+            //Чтение всех записей с постами
+            var usersWithPosts = await db.Users.Include(x => x.Posts).ToListAsync();
+
+            
+            foreach (var u in usersWithPosts)
+            {
+                Console.WriteLine($"{u.Name} ({u.Age}) написал {u.Posts.Count} пост(ов):");
+                foreach (var post in u.Posts)
+                    Console.WriteLine($"  - {post.Title}: {post.Content}");
+            }
         }
     }
 }
