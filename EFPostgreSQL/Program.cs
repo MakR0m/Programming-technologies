@@ -4,9 +4,13 @@ using EFPostgreSQL.Models;
 using EFPostgreSQL.Services.Implementations;
 using EFPostgreSQL.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Extensions.Logging;
 using System.Diagnostics.Metrics;
 using System.Runtime.InteropServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EFPostgreSQL
 {
@@ -162,10 +166,38 @@ namespace EFPostgreSQL
 
         #endregion
 
+        #region Logger
+        //Microsoft.Extensions.Logging (интерфейсы логирования)
+        //Microsoft.Extensions.Logging.Console
+        //Serilog.Extensions.Logging - мост к ILogger<T> для использования Serilog (реализация логирования)
+        //Serilog — ядро логгера
+        //Serilog.Sinks.Console — лог в консоль
+        //Serilog.Sinks.File — лог в файл
+        //| Возможность                     | Console.WriteLine   | ILogger      | Serilog  |
+        //| --------------------------------| ------------------- | ------------ | -------- |
+        //| Уровни логов(Info, Warn, Error) | -                   | +            | +        |
+        //| Запись в файл                   | -                   | -            | +        |
+        //| Структурированные данные(JSON)  | -                   | Частично     | +        |
+        //| Гибкая настройка(sinks)         | -                   | Ограничена   | +        |
+        //| Форматирование с шаблонами      | -                   | Частично     | +        |
+
+        #endregion
+
 
 
         static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug() // Устанавливаем минимальный уровень логирования (Debug и выше)
+                .WriteTo.Console() // Добавляем вывод логов в консоль
+                .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day) // Добавляем вывод логов в файл с ежедневной ротацией
+                .CreateLogger();// Создаём логгер
+
+            var loggerFactory = LoggerFactory.Create(builder =>  // Создаём фабрику логгеров и подключаем Serilog как реализацию ILogger
+            {
+                builder.AddSerilog(); // Добавляем Serilog в качестве источника логов
+            });
+
             var db = new AppDbContext();
 
             if (!await db.Database.CanConnectAsync())
@@ -173,8 +205,12 @@ namespace EFPostgreSQL
                 Console.WriteLine("Ошибка: не удалось подключиться к базе данных.");
                 return;
             }
-            IUserService userService = new UserService(db);
-            IPostService postService = new PostService(db);
+
+            var loggerUser = loggerFactory.CreateLogger<UserService>(); // Создаём логгер для UserService
+            var loggerPost = loggerFactory.CreateLogger<PostService>(); // Создаём логгер для PostService
+
+            IUserService userService = new UserService(db, loggerUser);
+            IPostService postService = new PostService(db, loggerPost);
             await RunMenu(userService, postService);
         }
 
@@ -227,8 +263,6 @@ namespace EFPostgreSQL
                 return;
             }
             await userService.AddAsync(name ?? string.Empty, age);
-            Console.WriteLine("Добавлен");
-
         }
 
         static async Task ShowUsersAsync(IUserService userService)
@@ -246,15 +280,14 @@ namespace EFPostgreSQL
             var newName = Console.ReadLine();
             Console.Write("Новый возраст: ");
             int.TryParse(Console.ReadLine(), out int newAge);
-            var success = await userService.UpdateAsync(user.Id, newName ?? string.Empty, newAge);
-            Console.WriteLine(success ? "Пользователь обновлён." : "Пользователь не найден.");
+            await userService.UpdateAsync(user.Id, newName ?? string.Empty, newAge);
         }
 
         static async Task DeleteUserByIdAsync(IUserService userService)
         {
             var user = await ReadAndCheckIdAsync("ID пользователя: ", userService.GetByIdAsync, "Пользователь не найден.");
             if (user == null) return;
-            var success = await userService.DeleteAsync(user.Id);
+            await userService.DeleteAsync(user.Id);
         }
 
         static async Task AddPostAsync(IUserService userService, IPostService postService)
@@ -303,8 +336,7 @@ namespace EFPostgreSQL
             var newTitle = Console.ReadLine();
             Console.Write("Новое содержание: ");
             var newContent = Console.ReadLine();
-            var success = await postService.UpdateAsync(post.Id, newTitle ?? string.Empty, newContent ?? string.Empty);
-            Console.WriteLine(success ? "Пост обновлён." : "Пост не найден.");
+            await postService.UpdateAsync(post.Id, newTitle ?? string.Empty, newContent ?? string.Empty);
 
         }
 

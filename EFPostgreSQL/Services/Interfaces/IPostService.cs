@@ -13,7 +13,7 @@ namespace EFPostgreSQL.Services.Interfaces
         Task<List<Post>> GetByUserIdAsync(int userId);
         Task<Post?> GetByIdAsync(int id);
         Task AddAsync(string title, string content, int userId);
-        Task<bool> UpdateAsync(int id, string title, string content);
-        Task<bool> DeleteAsync(int id);
+        Task UpdateAsync(int id, string title, string content);
+        Task DeleteAsync(int id);
     }
 }
