@@ -167,6 +167,12 @@ namespace EFPostgreSQL
         static async Task Main(string[] args)
         {
             var db = new AppDbContext();
+
+            if (!await db.Database.CanConnectAsync())
+            {
+                Console.WriteLine("Ошибка: не удалось подключиться к базе данных.");
+                return;
+            }
             IUserService userService = new UserService(db);
             IPostService postService = new PostService(db);
             await RunMenu(userService, postService);

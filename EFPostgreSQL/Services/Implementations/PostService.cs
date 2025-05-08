@@ -39,32 +39,55 @@ namespace EFPostgreSQL.Services.Implementations
 
         public async Task AddAsync(string title, string content, int userId)
         {
-            var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
-            if (!userExists)
-                throw new InvalidOperationException("Пользователь с таким ID не существует.");
+            try
+            {
+                var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
+                if (!userExists)
+                    throw new InvalidOperationException("Пользователь с таким ID не существует.");
 
-            var post = new Post { Title = title ?? string.Empty, Content = content ?? string.Empty, UserId = userId };
-            _db.Posts.Add(post);
-            await _db.SaveChangesAsync();
+                var post = new Post { Title = title ?? string.Empty, Content = content ?? string.Empty, UserId = userId };
+                _db.Posts.Add(post);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при добавлении поста: {ex.Message}");
+            }
         }
 
         public async Task<bool> UpdateAsync(int id, string title, string content)
         {
-            var post = await _db.Posts.FindAsync(id);
-            if (post == null) return false;
-            post.Title = title;
-            post.Content = content;
-            await _db.SaveChangesAsync();
-            return true;
+            try
+            {
+                var post = await _db.Posts.FindAsync(id);
+                if (post == null) return false;
+                post.Title = title;
+                post.Content = content;
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при обновлении поста: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var post = await _db.Posts.FindAsync(id);
-            if (post == null) return false;
-            _db.Posts.Remove(post);
-            await _db.SaveChangesAsync();
-            return true;
+            try
+            {
+                var post = await _db.Posts.FindAsync(id);
+                if (post == null) return false;
+                _db.Posts.Remove(post);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при удалении поста: {ex.Message}");
+                return false;
+            }
         }
 
     }

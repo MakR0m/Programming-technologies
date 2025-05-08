@@ -26,18 +26,33 @@ namespace EFPostgreSQL.Services.Implementations
 
         public async Task AddAsync(string name, int age)
         {
-            var user = new User { Name = name ?? string.Empty, Age = age };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
+            try
+            {
+                var user = new User { Name = name ?? string.Empty, Age = age };
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при добавлении пользователя: {ex.Message}");
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var user = await _db.Users.FindAsync(id);
-            if (user == null) return false;
-            _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
-            return true;
+            try
+            {
+                var user = await _db.Users.FindAsync(id);
+                if (user == null) return false;
+                _db.Users.Remove(user);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при удалении пользователя: {ex.Message}");
+                return false;
+            }
         }
 
 
