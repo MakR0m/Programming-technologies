@@ -1,6 +1,8 @@
 ﻿using EFPostgreSQL.Data;
 using EFPostgreSQL.Migrations;
 using EFPostgreSQL.Models;
+using EFPostgreSQL.Services.Implementations;
+using EFPostgreSQL.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System.Runtime.InteropServices;
@@ -116,13 +118,61 @@ namespace EFPostgreSQL
 
         #endregion
 
+        #region Связаные таблицы
+        //Создать навигационные свойства в классах 
+        //Это свойства, ссылающиеся на другие связанные сущности:
+        //- Post.User — доступ к пользователю из поста
+        //- User.Posts — доступ к списку постов из пользователя
+        //В AppDbContext прописать связность 
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<User>()
+        //        .HasMany(u => u.Posts)
+        //        .WithOne(p => p.User)
+        //        .HasForeignKey(p => p.UserId);
+        //}
+        #endregion
+
+        #region Навигационные свойства и .Include
+        //Допустим у нас Post имеет внешний ключ пользователя и навигационное свойство (сам объект User в свойстве). По умолчанию он null
+        //EF Core по умолчанию НЕ загружает связанные объекты (навигационные свойства), чтобы повысить эффективность
+        //Несмотря на то, что свойство User есть в классе, EF не загружает его содержимое пока явно не указать:
+        //.Include(p => p.User)  -  когда будешь грузить Post, сразу подтяни User, связанный по его UserId
+        //SELECT
+        //p.Id, p.Title, p.Content, p.UserId,
+        //u.Id, u.Name, u.Age
+        //FROM Posts AS p
+        //LEFT JOIN Users AS u ON p.UserId = u.Id
+        //Если просто написать .Where(p => p.User.Id == 5) будет ошибка т.к. User null
+
+        //.Include() работает с навигационными свойствами
+        //EF автоматически связывает объекты по внешним ключам
+        //результат — это граф объектов, а не анонимный тип
+
+        #endregion
+
+        #region Рефакторинг
+        //Чтобы не вызывать логику работы с бд в program создал User и Post сервисы и интерфейсы для них.
+        //Архитектура по DDD (Domain-Driven Design) или Clean Architecture предполагает, что у каждой предметной сущности есть свой сервис.
+        #endregion
+
+        #region Примечания
+        //Если мы вытащили объект с помощью FindAsync(id), то для его изменения достаточно поменять значения свойств, без Update(T), т.к. EF отслеживает этот объект (Change Tracking)
+        //Если объект не был получен из базы, то нужен Update(T). Можно создать post с айди который уже есть в базе, но с другими свойствами и вызвать апдейт, тогда в базе обновится пост с этим айди.
+
+        #endregion
+
+
 
         static async Task Main(string[] args)
         {
-            await RunMenu();
+            var db = new AppDbContext();
+            IUserService userService = new UserService(db);
+            IPostService postService = new PostService(db);
+            await RunMenu(userService, postService);
         }
 
-        static async Task RunMenu()
+        static async Task RunMenu(IUserService userService, IPostService postService)
         {
             while (true)
             {
@@ -133,164 +183,133 @@ namespace EFPostgreSQL
                 Console.WriteLine("4. Удалить пользователя");
                 Console.WriteLine("5. Добавить пост пользователю");
                 Console.WriteLine("6. Показать посты всех пользователей");
-                Console.WriteLine("7. Обновить пост");
-                Console.WriteLine("8. Удалить пост");
-                Console.WriteLine("9. Очистить базу данных");
-                Console.WriteLine("10. Выход");
+                Console.WriteLine("7. Показать все посты пользователя");
+                Console.WriteLine("8. Обновить пост");
+                Console.WriteLine("9. Удалить пост");
+                Console.WriteLine("10. Очистить базу данных");
+                Console.WriteLine("11. Выход");
                 Console.Write("Ваш выбор: ");
 
                 var input = Console.ReadLine();
 
-                using var db = new AppDbContext();
-
                 switch (input)
                 {
-                    case "1": await AddUserAsync(db); break;
-                    case "2": await ShowUsersAsync(db); break;
-                    case "3": await UpdateUserByIdAsync(db); break;
-                    case "4": await DeleteUserByIdAsync(db); break;
-                    case "5": await AddPostAsync(db); break;
-                    case "6": await ShowPostsAsync(db); break;
-                    case "7": await UpdatePostByIdAsync(db); break;
-                    case "8": await DeletePostByIdAsync(db); break;
-                    case "9": await ClearDatabaseAsync(db); break;
-                    case "10": return;
+                    case "1": await AddUserAsync(userService); break;
+                    case "2": await ShowUsersAsync(userService); break;
+                    case "3": await UpdateUserByIdAsync(userService); break;
+                    case "4": await DeleteUserByIdAsync(userService); break;
+                    case "5": await AddPostAsync(userService, postService); break;
+                    case "6": await ShowPostsAsync(postService); break;
+                    case "7": await ShowPostsByUser(userService, postService); break;
+                    case "8": await UpdatePostByIdAsync(postService); break;
+                    case "9": await DeletePostByIdAsync(postService); break;
+                    case "10": await ClearDatabaseAsync(userService, postService); break;
+                    case "11": return;
                     default: Console.WriteLine("Неверный ввод. Повторите попытку."); break;
                 }
             }
         }
 
-        static async Task AddUserAsync(AppDbContext db)
+        static async Task AddUserAsync(IUserService userService)
         {
             Console.Write("Имя пользователя: ");
             var name = Console.ReadLine();
             Console.Write("Возраст: ");
-            int.TryParse(name, out int age);
-            var user = new User { Name = name ?? string.Empty, Age = age };
-            db.Users.Add(user);
-            await db.SaveChangesAsync();
+            if (!int.TryParse(Console.ReadLine(), out int age))
+            {
+                Console.WriteLine("Не удалось распарсить возраст");
+                return;
+            }
+            await userService.AddAsync(name ?? string.Empty, age);
             Console.WriteLine("Добавлен");
 
         }
 
-        static async Task ShowUsersAsync(AppDbContext db)
+        static async Task ShowUsersAsync(IUserService userService)
         {
-            var users = await db.Users.ToListAsync();
+            var users = await userService.GetAllAsync();
             foreach (var user in users)
                 Console.WriteLine($"{user.Id}: {user.Name}, {user.Age} лет");
         }
 
-        static async Task UpdateUserByIdAsync(AppDbContext db)
+        static async Task UpdateUserByIdAsync(IUserService userService)
         {
-            Console.Write("ID пользователя для обновления: ");
-            if (!int.TryParse(Console.ReadLine(), out int id)) return;
-            var user = await db.Users.FindAsync(id);
-            if (user == null)
-            {
-                Console.WriteLine("User not found");
-                return;
-            }
-
-            Console.WriteLine("New name:");
-            user.Name = Console.ReadLine() ?? user.Name;
-            Console.WriteLine("New age:");
+            var user = await ReadAndCheckIdAsync("ID пользователя: ", userService.GetByIdAsync, "Пользователь не найден.");
+            if (user == null) return;
+            Console.Write("Новое имя: ");
+            var newName = Console.ReadLine();
+            Console.Write("Новый возраст: ");
             int.TryParse(Console.ReadLine(), out int newAge);
-            user.Age = newAge;
-            await db.SaveChangesAsync();
-            Console.WriteLine("User updated");
+            var success = await userService.UpdateAsync(user.Id, newName ?? string.Empty, newAge);
+            Console.WriteLine(success ? "Пользователь обновлён." : "Пользователь не найден.");
         }
 
-        static async Task DeleteUserByIdAsync(AppDbContext db)
+        static async Task DeleteUserByIdAsync(IUserService userService)
         {
-            Console.Write("ID пользователя для удаления: ");
-            if (!int.TryParse(Console.ReadLine(), out int id)) return;
-            var user = await db.Users.FindAsync(id);
-            if ( user == null)
-            {
-                Console.WriteLine("Пользователь не найден.");
-                return;
-            }
-            db.Users.Remove(user);
-            await db.SaveChangesAsync();
-            Console.WriteLine("User was delete");
+            var user = await ReadAndCheckIdAsync("ID пользователя: ", userService.GetByIdAsync, "Пользователь не найден.");
+            if (user == null) return;
+            var success = await userService.DeleteAsync(user.Id);
         }
 
-        static async Task AddPostAsync(AppDbContext db)
+        static async Task AddPostAsync(IUserService userService, IPostService postService)
         {
-            Console.Write("ID пользователя, которому добавить пост: ");
-            int.TryParse(Console.ReadLine(), out int userId);
-            var user = await db.Users.FindAsync(userId);
-            if (user == null)
-            {
-                Console.WriteLine("Пользователь не найден.");
-                return;
-            }
-
+            var user = await ReadAndCheckIdAsync("ID пользователя, которому добавить пост: ", userService.GetByIdAsync, "Пользователь не найден.");
+            if (user == null) return;
+            
             Console.Write("Заголовок поста: ");
             var title = Console.ReadLine();
             Console.Write("Содержание поста: ");
             var content = Console.ReadLine();
-
-            var post = new Post { Title = title ?? string.Empty, Content = content ?? string.Empty, UserId = userId };
-            db.Posts.Add(post);
-            await db.SaveChangesAsync();
+            await postService.AddAsync(title ?? string.Empty, content ?? string.Empty,user.Id);
             Console.WriteLine("Пост добавлен.");
 
         }
 
-        static async Task ShowPostsAsync(AppDbContext db)
+        static async Task ShowPostsAsync(IPostService postService)
         {
-            var users = await db.Users.Include(u => u.Posts).ToListAsync();
-            foreach (var user in users)
-            {
-                Console.WriteLine($"{user.Name} ({user.Id}):");
-                foreach (var post in user.Posts)
-                {
-                    Console.WriteLine($" - {post.Id}: {post.Title}: {post.Content}");
-                }
-            }
+            var posts = await postService.GetAllAsync();
+            foreach (var p in posts)
+                Console.WriteLine($"{p.Id}: {p.Title} ({p.User.Name})");
         }
 
-        static async Task UpdatePostByIdAsync(AppDbContext db)
+        static async Task ShowPostsByUser(IUserService userService, IPostService postService)
         {
-            Console.Write("ID поста для обновления: ");
-            if (!int.TryParse(Console.ReadLine(), out int id)) return;
+            var user = await ReadAndCheckIdAsync("ID пользователя: ", userService.GetByIdAsync, "Пользователь не найден.");
+            if (user == null) return;
 
-            var post = await db.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
-            if (post == null)
+            var posts = await postService.GetByUserIdAsync(user.Id);
+            if (posts.Count == 0)
             {
-                Console.WriteLine("Пост не найден.");
+                Console.WriteLine("У этого пользователя нет постов.");
                 return;
             }
 
+            foreach (var p in posts)
+                Console.WriteLine($"{p.Id}: {p.Title}");
+        }
+
+        static async Task UpdatePostByIdAsync(IPostService postService)
+        {
+            var post = await ReadAndCheckIdAsync("ID поста: ", postService.GetByIdAsync, "Пост не найден.");
+            if (post == null) return;
+            
             Console.Write("Новый заголовок: ");
-            post.Title = Console.ReadLine() ?? post.Title;
+            var newTitle = Console.ReadLine();
             Console.Write("Новое содержание: ");
-            post.Content = Console.ReadLine() ?? post.Content;
-            await db.SaveChangesAsync();
-            Console.WriteLine("Пост обновлён.");
+            var newContent = Console.ReadLine();
+            var success = await postService.UpdateAsync(post.Id, newTitle ?? string.Empty, newContent ?? string.Empty);
+            Console.WriteLine(success ? "Пост обновлён." : "Пост не найден.");
 
         }
 
-        static async Task DeletePostByIdAsync(AppDbContext db)
+        static async Task DeletePostByIdAsync(IPostService postService)
         {
-            Console.Write("ID поста для удаления: ");
-            if (!int.TryParse(Console.ReadLine(), out int id)) return;
-
-            var post = await db.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
-            if (post == null)
-            {
-                Console.WriteLine("Пост не найден.");
-                return;
-            }
-
-            db.Posts.Remove(post);
-            await db.SaveChangesAsync();
-            Console.WriteLine("Пост удалён.");
-
+            var post = await ReadAndCheckIdAsync("ID поста: ", postService.GetByIdAsync, "Пост не найден.");
+            if (post == null) return;
+            await postService.DeleteAsync(post.Id);
         }
 
-        static async Task ClearDatabaseAsync(AppDbContext db)
+        static async Task ClearDatabaseAsync(IUserService userService, IPostService postService)
         {
             Console.Write("Вы уверены, что хотите удалить всех пользователей и посты? (y/n): ");
             var confirm = Console.ReadLine();
@@ -299,12 +318,34 @@ namespace EFPostgreSQL
                 Console.WriteLine("Операция отменена.");
                 return;
             }
+            var allPosts = await postService.GetAllAsync();
+            foreach (var p in allPosts)
+                await postService.DeleteAsync(p.Id);
 
-            db.Posts.RemoveRange(db.Posts);
-            db.Users.RemoveRange(db.Users);
-            await db.SaveChangesAsync();
+            var allUsers = await userService.GetAllAsync();
+            foreach (var u in allUsers)
+                await userService.DeleteAsync(u.Id);
             Console.WriteLine("База данных очищена.");
+        }
 
+
+        private static async Task<T?> ReadAndCheckIdAsync<T>(string prompt, Func<int, Task<T?>> fetchById, string notFoundMessage) // передаем ссылку на метод поиска по айди и сообщения в случае удачи и неудачи
+        {
+            Console.Write(prompt);
+            if (!int.TryParse(Console.ReadLine(), out int id))   //Вводим айди с консоли
+            {
+                Console.WriteLine("Неверный ввод ID.");
+                return default;
+            }
+
+            var entity = await fetchById(id);     //Передаем айди в метод
+            if (entity == null)
+            {
+                Console.WriteLine(notFoundMessage);
+                return default;
+            }
+
+            return entity;
         }
     }
 }
