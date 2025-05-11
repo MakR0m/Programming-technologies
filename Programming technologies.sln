@@ -9,9 +9,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOLID", "SOLID\SOLID.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DesignPatterns", "DesignPatterns\DesignPatterns.csproj", "{6E163ADA-191F-4A01-81A4-80F858D217A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Concurrency", "Concurrency\Concurrency.csproj", "{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Concurrency", "Concurrency\Concurrency.csproj", "{0ACE8959-0FF8-41C6-B995-5E7B7FC853E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFPostgreSQL", "EFPostgreSQL\EFPostgreSQL.csproj", "{3C0B1213-6D62-4C78-8101-05D2608C6897}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFPostgreSQL", "EFPostgreSQL\EFPostgreSQL.csproj", "{3C0B1213-6D62-4C78-8101-05D2608C6897}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TDD", "TDD", "{1EA124F9-7361-487A-95CA-DCF08025FC8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TddPractice.Core", "TddPractice.Core\TddPractice.Core.csproj", "{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TddPractice.Tests", "TddPractice.Tests\TddPractice.Tests.csproj", "{40624CA4-3F49-4F28-BF32-258C33416AFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C} = {B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +48,21 @@ Global
 		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C0B1213-6D62-4C78-8101-05D2608C6897}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40624CA4-3F49-4F28-BF32-258C33416AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40624CA4-3F49-4F28-BF32-258C33416AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40624CA4-3F49-4F28-BF32-258C33416AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40624CA4-3F49-4F28-BF32-258C33416AFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B6EC3453-A661-49AC-8EE3-4F214E8BAA8C} = {1EA124F9-7361-487A-95CA-DCF08025FC8F}
+		{40624CA4-3F49-4F28-BF32-258C33416AFA} = {1EA124F9-7361-487A-95CA-DCF08025FC8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B2D327CB-7FDB-461B-86E2-DBE2E04CEAA0}
